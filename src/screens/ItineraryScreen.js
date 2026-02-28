@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, ScrollView, RefreshControl, StyleSheet } from 'react-native';
 import { DAYS } from '../data/weather';
 import DaySelector from '../components/DaySelector';
 import WeatherBar from '../components/WeatherBar';
@@ -24,7 +24,7 @@ function DayProgress({ activities }) {
   );
 }
 
-function TimeSection({ label, emoji, activities, onUpdate, dayId }) {
+function TimeSection({ label, emoji, activities, onUpdate, onSwap, dayId, settings }) {
   if (!activities || !activities.length) return null;
   return (
     <View style={{ marginBottom: 20 }}>
@@ -34,13 +34,14 @@ function TimeSection({ label, emoji, activities, onUpdate, dayId }) {
         <Text style={styles.sectionCount}>{activities.length}</Text>
       </View>
       {activities.map(a => (
-        <ActivityCard key={a.id} activity={a} onUpdate={onUpdate} dayId={dayId} />
+        <ActivityCard key={a.id} activity={a} onUpdate={onUpdate} onSwap={onSwap} dayId={dayId} settings={settings} />
       ))}
     </View>
   );
 }
 
-export default function ItineraryScreen({ activities, setActivities, selectedDay, setSelectedDay }) {
+export default function ItineraryScreen({ activities, setActivities, selectedDay, setSelectedDay, settings }) {
+  const [refreshing, setRefreshing] = useState(false);
   const day = DAYS[selectedDay];
   const da = activities[selectedDay] || { morning: [], afternoon: [], evening: [] };
 
@@ -56,10 +57,31 @@ export default function ItineraryScreen({ activities, setActivities, selectedDay
     });
   };
 
+  const swap = (id, newActivity) => {
+    setActivities(prev => {
+      const u = { ...prev };
+      const d = { ...u[selectedDay] };
+      for (const s of ['morning', 'afternoon', 'evening']) {
+        d[s] = d[s].map(a => a.id === id ? { ...newActivity, id } : a);
+      }
+      u[selectedDay] = d;
+      return u;
+    });
+  };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 500);
+  }, []);
+
   const empty = !da.morning.length && !da.afternoon.length && !da.evening.length;
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: LIGHT_BG }} contentContainerStyle={styles.container}>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: LIGHT_BG }}
+      contentContainerStyle={styles.container}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={ACCENT} colors={[ACCENT]} />}
+    >
       <DaySelector selectedDay={selectedDay} onSelect={setSelectedDay} />
       <View style={styles.dayHeader}>
         <Text style={styles.dayTitle}>{day.title}</Text>
@@ -74,9 +96,9 @@ export default function ItineraryScreen({ activities, setActivities, selectedDay
         </View>
       ) : (
         <>
-          <TimeSection label="Morning" emoji="🌅" activities={da.morning} onUpdate={update} dayId={selectedDay} />
-          <TimeSection label="Afternoon" emoji="☀️" activities={da.afternoon} onUpdate={update} dayId={selectedDay} />
-          <TimeSection label="Evening" emoji="🌙" activities={da.evening} onUpdate={update} dayId={selectedDay} />
+          <TimeSection label="Morning" emoji="🌅" activities={da.morning} onUpdate={update} onSwap={swap} dayId={selectedDay} settings={settings} />
+          <TimeSection label="Afternoon" emoji="☀️" activities={da.afternoon} onUpdate={update} onSwap={swap} dayId={selectedDay} settings={settings} />
+          <TimeSection label="Evening" emoji="🌙" activities={da.evening} onUpdate={update} onSwap={swap} dayId={selectedDay} settings={settings} />
         </>
       )}
     </ScrollView>
@@ -93,9 +115,9 @@ const styles = StyleSheet.create({
   progressText: { fontSize: 12, color: '#6B7280' },
   progressBar: { height: 6, backgroundColor: '#E5E7EB', borderRadius: 3, overflow: 'hidden' },
   progressFill: { height: '100%', backgroundColor: ACCENT, borderRadius: 3 },
-  sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
-  sectionLabel: { fontWeight: '700', fontSize: 14, color: DARK, textTransform: 'uppercase', letterSpacing: 0.5 },
-  sectionCount: { fontSize: 12, color: GRAY },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+  sectionLabel: { fontWeight: '700', fontSize: 14, color: DARK, textTransform: 'uppercase', letterSpacing: 0.5, marginLeft: 8 },
+  sectionCount: { fontSize: 12, color: GRAY, marginLeft: 8 },
   empty: { alignItems: 'center', padding: 48 },
   emptyText: { fontSize: 15, fontWeight: '500', color: GRAY },
 });

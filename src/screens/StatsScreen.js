@@ -47,7 +47,7 @@ export default function StatsScreen({ activities, expenses, setExpenses }) {
   const [expNote, setExpNote] = useState('');
   const totalUSD = expenses.reduce((s, e) => s + e.amount, 0);
   const totalEUR = (totalUSD * EUR_RATE).toFixed(2);
-  const expCats = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Drinks', 'Other'];
+  const expCats = ['🍕 Food', '🚇 Transport', '🛍️ Shopping', '🎭 Entertainment', '🍺 Drinks', '📦 Other'];
 
   const addExpense = () => {
     const amt = parseFloat(expAmt);

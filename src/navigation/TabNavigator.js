@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,9 +8,16 @@ import EventsScreen from '../screens/EventsScreen';
 import FlightsScreen from '../screens/FlightsScreen';
 import StatsScreen from '../screens/StatsScreen';
 import GuideScreen from '../screens/GuideScreen';
+import SettingsScreen from '../screens/SettingsScreen';
 import ChatOverlay from '../components/ChatOverlay';
 import { initialActivities } from '../data/activities';
 import { ACCENT, DARK, GRAY, WHITE } from '../theme';
+import {
+  saveActivities, loadActivities,
+  saveExpenses, loadExpenses,
+  saveSettings, loadSettings,
+  DEFAULT_SETTINGS,
+} from '../utils/storage';
 
 const Tab = createBottomTabNavigator();
 
@@ -21,6 +28,7 @@ const TAB_ICONS = {
   Flights: '✈️',
   Stats: '📊',
   Guide: '🗽',
+  Settings: '⚙️',
 };
 
 function Header() {
@@ -42,8 +50,30 @@ export default function TabNavigator() {
   const [activities, setActivities] = useState(initialActivities);
   const [selectedDay, setSelectedDay] = useState(0);
   const [expenses, setExpenses] = useState([]);
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [chatOpen, setChatOpen] = useState(false);
+  const loaded = useRef(false);
   const insets = useSafeAreaInsets();
+
+  // Load persisted state on mount
+  useEffect(() => {
+    (async () => {
+      const [savedActs, savedExp, savedSettings] = await Promise.all([
+        loadActivities(),
+        loadExpenses(),
+        loadSettings(),
+      ]);
+      if (savedActs) setActivities(savedActs);
+      if (savedExp) setExpenses(savedExp);
+      if (savedSettings) setSettings(savedSettings);
+      loaded.current = true;
+    })();
+  }, []);
+
+  // Persist on changes (skip initial load)
+  useEffect(() => { if (loaded.current) saveActivities(activities); }, [activities]);
+  useEffect(() => { if (loaded.current) saveExpenses(expenses); }, [expenses]);
+  useEffect(() => { if (loaded.current) saveSettings(settings); }, [settings]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -74,6 +104,7 @@ export default function TabNavigator() {
               setActivities={setActivities}
               selectedDay={selectedDay}
               setSelectedDay={setSelectedDay}
+              settings={settings}
             />
           )}
         </Tab.Screen>
@@ -90,6 +121,14 @@ export default function TabNavigator() {
           )}
         </Tab.Screen>
         <Tab.Screen name="Guide" component={GuideScreen} />
+        <Tab.Screen name="Settings">
+          {() => (
+            <SettingsScreen
+              settings={settings}
+              setSettings={setSettings}
+            />
+          )}
+        </Tab.Screen>
       </Tab.Navigator>
 
       {/* Chat FAB */}
@@ -101,7 +140,7 @@ export default function TabNavigator() {
         <Text style={{ fontSize: 24 }}>💬</Text>
       </TouchableOpacity>
 
-      <ChatOverlay visible={chatOpen} onClose={() => setChatOpen(false)} />
+      <ChatOverlay visible={chatOpen} onClose={() => setChatOpen(false)} settings={settings} />
     </View>
   );
 }

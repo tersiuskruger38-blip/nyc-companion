@@ -21,7 +21,20 @@ Day 3 (Mon Mar 16): Met Museum, Guggenheim, Levain Bakery, Natural History Museu
 Day 4 (Tue Mar 17): St. Patrick's Day Parade, Empire State Building, Koreatown, McSorley's, pub crawl
 Day 5 (Wed Mar 18): Russ & Daughters, Washington Square Park, pack up, flight home UA 994 EWR→BRU at 19:55`;
 
-export async function sendChatMessage(userMessage, conversationHistory = []) {
+export async function sendChatMessage(userMessage, conversationHistory = [], settings = null) {
+  let systemPrompt = SYSTEM_PROMPT;
+  if (settings) {
+    const prefs = [];
+    if (settings.preferIndoor) prefs.push('They prefer indoor activities when possible.');
+    if (settings.budgetLevel === 'budget') prefs.push('They are very budget-conscious.');
+    if (settings.budgetLevel === 'splurge') prefs.push('They are happy to splurge on great experiences.');
+    if (settings.walkingComfort === 'minimal') prefs.push('They prefer minimal walking — suggest nearby options and transit.');
+    if (settings.walkingComfort === 'marathon') prefs.push('They love walking and exploring on foot.');
+    if (settings.avoidCrowds) prefs.push('They prefer avoiding crowded tourist spots.');
+    if (settings.foodPreferences?.length) prefs.push(`Food preferences: ${settings.foodPreferences.join(', ')}.`);
+    if (prefs.length) systemPrompt += '\n\nUser preferences:\n' + prefs.join('\n');
+  }
+
   const messages = [
     ...conversationHistory.map(m => ({
       role: m.from === 'user' ? 'user' : 'assistant',
@@ -41,7 +54,7 @@ export async function sendChatMessage(userMessage, conversationHistory = []) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 512,
-        system: SYSTEM_PROMPT,
+        system: systemPrompt,
         messages,
       }),
     });
@@ -56,6 +69,49 @@ export async function sendChatMessage(userMessage, conversationHistory = []) {
     return data.content?.[0]?.text || null;
   } catch (error) {
     console.warn('Chat API failed:', error);
+    return null;
+  }
+}
+
+export async function getSwapSuggestion(activity, weather, dayLabel, settings = null) {
+  const prompt = `I need a replacement for this activity because of weather:
+
+Activity: ${activity.name} (${activity.category}, ${activity.time}, ${activity.duration})
+Weather: ${weather.label}, ${weather.temp}°C, ${weather.wind} km/h wind, ${weather.rain}% rain chance
+Day: ${dayLabel}
+
+${settings?.preferIndoor ? 'I prefer indoor activities.' : ''}
+${settings?.budgetLevel === 'budget' ? 'Keep it cheap.' : ''}
+
+Suggest ONE specific replacement activity. Reply in this exact JSON format only, no other text:
+{"name":"...","category":"museum|food|entertainment|shopping|sightseeing","time":"${activity.time}","duration":"...","price":"free|$|$$|$$$","description":"...","address":"...","notes":"...","reason":"Why this is a better pick"}`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        system: 'You are an NYC activity recommender. Respond with valid JSON only, no markdown or extra text.',
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+
+    if (!response.ok) return null;
+    const data = await response.json();
+    const text = data.content?.[0]?.text;
+    if (!text) return null;
+    // Extract JSON from response
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return null;
+    return JSON.parse(jsonMatch[0]);
+  } catch (error) {
+    console.warn('Swap suggestion failed:', error);
     return null;
   }
 }
