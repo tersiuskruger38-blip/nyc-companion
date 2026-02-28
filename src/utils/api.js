@@ -14,12 +14,14 @@ Key context:
 When asked about nearby places, reference their hotel location (Ludlow St, LES) and suggest walking distances. When asked about food, prioritize places from their wishlist.
 
 Their itinerary:
-Day 0 (Fri Mar 13): Arrive, Explore LES, Tompkins Sq Bagels, East Village walk, Rubirosa pizza
-Day 1 (Sat Mar 14): High Line, Chelsea Market, Little Island, Brooklyn Bridge, DUMBO, King Dumplings, Fiaschetteria Pistoia, Elsewhere
-Day 2 (Sun Mar 15): Central Park, Top of the Rock, MoMA, Times Square, Grand Central, Katz's Deli, Comedy Cellar
-Day 3 (Mon Mar 16): Met Museum, Guggenheim, Levain Bakery, Natural History Museum, Joe's Pizza, Village Vanguard
-Day 4 (Tue Mar 17): St. Patrick's Day Parade, Empire State Building, Koreatown, McSorley's, pub crawl
-Day 5 (Wed Mar 18): Russ & Daughters, Washington Square Park, pack up, flight home UA 994 EWR→BRU at 19:55`;
+Day 0 (Fri Mar 13): Arrive, Explore LES, Tompkins Sq Bagels, Rubirosa pizza
+Day 1 (Sat Mar 14): High Line, Chelsea Market, Little Island, Brooklyn Bridge, DUMBO, rest at hotel, King Dumplings, Fiaschetteria Pistoia
+Day 2 (Sun Mar 15): Central Park, Top of the Rock, lunch, MoMA (only museum today), Times Square quick stop, Grand Central, Katz's Deli, Comedy Cellar
+Day 3 (Mon Mar 16): Met Museum (only museum today), Central Park upper loop, Levain Bakery, Upper West Side stroll, rest at hotel, Joe's Pizza, Village Vanguard
+Day 4 (Tue Mar 17): St. Patrick's Day Parade, Koreatown lunch, Empire State Building, rest, McSorley's, East Village bar hop
+Day 5 (Wed Mar 18): Russ & Daughters, Washington Square Park, pack up, flight home UA 994 EWR→BRU at 19:55
+
+Important: They only have 2 museum visits planned (MoMA on Day 2, Met on Day 3). They need rest breaks — suggest downtime when they seem overloaded. They'll be walking a lot so factor in fatigue, especially after Day 2.`;
 
 export async function sendChatMessage(userMessage, conversationHistory = [], settings = null) {
   let systemPrompt = SYSTEM_PROMPT;
