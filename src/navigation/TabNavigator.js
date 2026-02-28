@@ -8,6 +8,7 @@ import EventsScreen from '../screens/EventsScreen';
 import FlightsScreen from '../screens/FlightsScreen';
 import StatsScreen from '../screens/StatsScreen';
 import GuideScreen from '../screens/GuideScreen';
+import ChatOverlay from '../components/ChatOverlay';
 import { initialActivities } from '../data/activities';
 import { ACCENT, DARK, GRAY, WHITE } from '../theme';
 
@@ -41,11 +42,12 @@ export default function TabNavigator() {
   const [activities, setActivities] = useState(initialActivities);
   const [selectedDay, setSelectedDay] = useState(0);
   const [expenses, setExpenses] = useState([]);
+  const [chatOpen, setChatOpen] = useState(false);
   const insets = useSafeAreaInsets();
 
   return (
     <View style={{ flex: 1 }}>
-      <View style={{ paddingTop: insets.top }}>
+      <View style={{ paddingTop: insets.top, backgroundColor: DARK }}>
         <Header />
       </View>
       <Tab.Navigator
@@ -78,7 +80,15 @@ export default function TabNavigator() {
         <Tab.Screen name="Places" component={PlacesScreen} />
         <Tab.Screen name="Events" component={EventsScreen} />
         <Tab.Screen name="Flights" component={FlightsScreen} />
-        <Tab.Screen name="Stats" component={StatsScreen} />
+        <Tab.Screen name="Stats">
+          {() => (
+            <StatsScreen
+              activities={activities}
+              expenses={expenses}
+              setExpenses={setExpenses}
+            />
+          )}
+        </Tab.Screen>
         <Tab.Screen name="Guide" component={GuideScreen} />
       </Tab.Navigator>
 
@@ -86,10 +96,12 @@ export default function TabNavigator() {
       <TouchableOpacity
         style={[styles.fab, { bottom: 64 + (insets.bottom > 0 ? insets.bottom : 8) }]}
         activeOpacity={0.8}
-        onPress={() => {/* Chat overlay coming later */}}
+        onPress={() => setChatOpen(true)}
       >
         <Text style={{ fontSize: 24 }}>💬</Text>
       </TouchableOpacity>
+
+      <ChatOverlay visible={chatOpen} onClose={() => setChatOpen(false)} />
     </View>
   );
 }
