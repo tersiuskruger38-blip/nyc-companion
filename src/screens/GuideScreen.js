@@ -1,18 +1,43 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { GUIDE_SECTIONS } from '../data/guide';
 import { DARK, GRAY, WHITE, LIGHT_BG } from '../theme';
+
+function GuideItem({ item, index, sectionId, openItem, setOpenItem }) {
+  const itemKey = `${sectionId}-${index}`;
+  const isOpen = openItem === itemKey;
+  return (
+    <View style={{ marginTop: 6 }}>
+      <TouchableOpacity onPress={() => setOpenItem(isOpen ? null : itemKey)} style={styles.itemBtn}>
+        <Text style={styles.itemQ}>{item.q}</Text>
+        <Text style={styles.itemToggle}>{isOpen ? '−' : '+'}</Text>
+      </TouchableOpacity>
+      {isOpen && (
+        <View style={styles.itemAnswer}>
+          <Text style={styles.itemA}>{item.a}</Text>
+        </View>
+      )}
+    </View>
+  );
+}
 
 export default function GuideScreen() {
   const [search, setSearch] = useState('');
   const [openSection, setOpenSection] = useState('transport');
   const [openItem, setOpenItem] = useState(null);
 
-  return (
-    <ScrollView style={styles.scroll} contentContainerStyle={styles.container}>
+  const sections = GUIDE_SECTIONS.map(section => {
+    const items = search
+      ? section.items.filter(i => i.q.toLowerCase().includes(search.toLowerCase()) || i.a.toLowerCase().includes(search.toLowerCase()))
+      : section.items;
+    if (search && !items.length) return null;
+    return { ...section, filteredItems: items };
+  }).filter(Boolean);
+
+  const renderHeader = () => (
+    <View>
       <Text style={styles.title}>NYC Survival Guide</Text>
       <Text style={styles.subtitle}>Everything you need to know — from a first-timer's perspective</Text>
-
       <TextInput
         value={search}
         onChangeText={setSearch}
@@ -20,53 +45,39 @@ export default function GuideScreen() {
         placeholderTextColor={GRAY}
         style={styles.searchInput}
       />
+    </View>
+  );
 
-      {GUIDE_SECTIONS.map(section => {
-        const items = search
-          ? section.items.filter(i => i.q.toLowerCase().includes(search.toLowerCase()) || i.a.toLowerCase().includes(search.toLowerCase()))
-          : section.items;
-        if (search && !items.length) return null;
-        const isOpen = openSection === section.id || !!search;
-
-        return (
-          <View key={section.id} style={{ marginBottom: 10 }}>
-            <TouchableOpacity
-              onPress={() => setOpenSection(isOpen && !search ? null : section.id)}
-              style={styles.sectionBtn}
-            >
-              <Text style={styles.sectionTitle}>{section.title}</Text>
-              <Text style={[styles.arrow, isOpen && styles.arrowOpen]}>▼</Text>
-            </TouchableOpacity>
-
-            {isOpen && items.map((item, i) => {
-              const itemKey = `${section.id}-${i}`;
-              const isItemOpen = openItem === itemKey;
-              return (
-                <View key={i} style={{ marginTop: 6 }}>
-                  <TouchableOpacity
-                    onPress={() => setOpenItem(isItemOpen ? null : itemKey)}
-                    style={styles.itemBtn}
-                  >
-                    <Text style={styles.itemQ}>{item.q}</Text>
-                    <Text style={styles.itemToggle}>{isItemOpen ? '−' : '+'}</Text>
-                  </TouchableOpacity>
-                  {isItemOpen && (
-                    <View style={styles.itemAnswer}>
-                      <Text style={styles.itemA}>{item.a}</Text>
-                    </View>
-                  )}
-                </View>
-              );
-            })}
-          </View>
-        );
-      })}
-    </ScrollView>
+  return (
+    <View style={{ flex: 1, backgroundColor: LIGHT_BG }}>
+      <FlatList
+        data={sections}
+        keyExtractor={s => s.id}
+        contentContainerStyle={styles.container}
+        ListHeaderComponent={renderHeader}
+        renderItem={({ item: section }) => {
+          const isOpen = openSection === section.id || !!search;
+          return (
+            <View style={{ marginBottom: 10 }}>
+              <TouchableOpacity
+                onPress={() => setOpenSection(isOpen && !search ? null : section.id)}
+                style={styles.sectionBtn}
+              >
+                <Text style={styles.sectionTitle}>{section.title}</Text>
+                <Text style={[styles.arrow, isOpen && styles.arrowOpen]}>▼</Text>
+              </TouchableOpacity>
+              {isOpen && section.filteredItems.map((item, i) => (
+                <GuideItem key={i} item={item} index={i} sectionId={section.id} openItem={openItem} setOpenItem={setOpenItem} />
+              ))}
+            </View>
+          );
+        }}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: LIGHT_BG },
   container: { padding: 16, paddingBottom: 100 },
   title: { fontSize: 22, fontWeight: '800', color: DARK, marginBottom: 4 },
   subtitle: { fontSize: 13, color: GRAY, marginBottom: 12 },

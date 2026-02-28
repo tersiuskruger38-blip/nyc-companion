@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, FlatList, StyleSheet } from 'react-native';
 import { DAYS, WEATHER } from '../data/weather';
 import { getAllActivities, parseDuration, estimateSteps } from '../utils/helpers';
 import { ACCENT, DARK, GRAY, GREEN, WHITE, LIGHT_BG } from '../theme';
@@ -134,16 +134,20 @@ export default function StatsScreen({ activities, expenses, setExpenses }) {
             onChangeText={setExpAmt}
             style={[styles.input, { flex: 1 }]}
           />
-          <View style={styles.catPicker}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 4 }}>
-              {expCats.map(c => (
-                <TouchableOpacity key={c} onPress={() => setExpCat(c)} style={[styles.catChip, expCat === c && styles.catChipActive]}>
-                  <Text style={[styles.catChipText, expCat === c && styles.catChipTextActive]}>{c}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
         </View>
+        <FlatList
+          horizontal
+          data={expCats}
+          keyExtractor={c => c}
+          showsHorizontalScrollIndicator={false}
+          style={{ marginBottom: 8 }}
+          renderItem={({ item: c }) => (
+            <TouchableOpacity onPress={() => setExpCat(c)} style={[styles.catChip, expCat === c && styles.catChipActive]}>
+              <Text style={[styles.catChipText, expCat === c && styles.catChipTextActive]}>{c}</Text>
+            </TouchableOpacity>
+          )}
+          ItemSeparatorComponent={() => <View style={{ width: 4 }} />}
+        />
         <View style={styles.formRow}>
           <TextInput
             placeholder="Note (optional)"

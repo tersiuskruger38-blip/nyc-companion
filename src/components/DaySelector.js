@@ -1,16 +1,20 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { DAYS, WEATHER } from '../data/weather';
 import { ACCENT, DARK, WHITE } from '../theme';
 
 export default function DaySelector({ selectedDay, onSelect }) {
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scroll} contentContainerStyle={styles.content}>
-      {DAYS.map(d => {
+    <FlatList
+      horizontal
+      data={DAYS}
+      keyExtractor={d => String(d.id)}
+      showsHorizontalScrollIndicator={false}
+      style={styles.list}
+      renderItem={({ item: d }) => {
         const active = selectedDay === d.id;
         return (
           <TouchableOpacity
-            key={d.id}
             onPress={() => onSelect(d.id)}
             style={[styles.chip, active && styles.chipActive]}
           >
@@ -20,14 +24,14 @@ export default function DaySelector({ selectedDay, onSelect }) {
             </Text>
           </TouchableOpacity>
         );
-      })}
-    </ScrollView>
+      }}
+      ItemSeparatorComponent={() => <View style={{ width: 6 }} />}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  scroll: { marginBottom: 12 },
-  content: { gap: 6, paddingRight: 4 },
+  list: { marginBottom: 12 },
   chip: {
     paddingHorizontal: 14,
     paddingVertical: 8,
