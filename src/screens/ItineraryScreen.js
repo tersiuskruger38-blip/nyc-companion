@@ -24,8 +24,10 @@ function DayProgress({ activities }) {
   );
 }
 
-function TimeSection({ label, emoji, activities, onUpdate, onSwap, dayId, settings }) {
+function TimeSection({ label, emoji, activities, onUpdate, onSwap, onFieldUpdate, dayId, settings }) {
   if (!activities || !activities.length) return null;
+  // Sort starred to top within each section
+  const sorted = [...activities].sort((a, b) => (b.starred ? 1 : 0) - (a.starred ? 1 : 0));
   return (
     <View style={{ marginBottom: 20 }}>
       <View style={styles.sectionHeader}>
@@ -33,8 +35,8 @@ function TimeSection({ label, emoji, activities, onUpdate, onSwap, dayId, settin
         <Text style={styles.sectionLabel}>{label}</Text>
         <Text style={styles.sectionCount}>{activities.length}</Text>
       </View>
-      {activities.map(a => (
-        <ActivityCard key={a.id} activity={a} onUpdate={onUpdate} onSwap={onSwap} dayId={dayId} settings={settings} />
+      {sorted.map(a => (
+        <ActivityCard key={a.id} activity={a} onUpdate={onUpdate} onSwap={onSwap} onFieldUpdate={onFieldUpdate} dayId={dayId} settings={settings} />
       ))}
     </View>
   );
@@ -69,6 +71,18 @@ export default function ItineraryScreen({ activities, setActivities, selectedDay
     });
   };
 
+  const updateField = (id, field, value) => {
+    setActivities(prev => {
+      const u = { ...prev };
+      const d = { ...u[selectedDay] };
+      for (const s of ['morning', 'afternoon', 'evening']) {
+        d[s] = d[s].map(a => a.id === id ? { ...a, [field]: value } : a);
+      }
+      u[selectedDay] = d;
+      return u;
+    });
+  };
+
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setTimeout(() => setRefreshing(false), 500);
@@ -96,9 +110,9 @@ export default function ItineraryScreen({ activities, setActivities, selectedDay
         </View>
       ) : (
         <>
-          <TimeSection label="Morning" emoji="🌅" activities={da.morning} onUpdate={update} onSwap={swap} dayId={selectedDay} settings={settings} />
-          <TimeSection label="Afternoon" emoji="☀️" activities={da.afternoon} onUpdate={update} onSwap={swap} dayId={selectedDay} settings={settings} />
-          <TimeSection label="Evening" emoji="🌙" activities={da.evening} onUpdate={update} onSwap={swap} dayId={selectedDay} settings={settings} />
+          <TimeSection label="Morning" emoji="🌅" activities={da.morning} onUpdate={update} onSwap={swap} onFieldUpdate={updateField} dayId={selectedDay} settings={settings} />
+          <TimeSection label="Afternoon" emoji="☀️" activities={da.afternoon} onUpdate={update} onSwap={swap} onFieldUpdate={updateField} dayId={selectedDay} settings={settings} />
+          <TimeSection label="Evening" emoji="🌙" activities={da.evening} onUpdate={update} onSwap={swap} onFieldUpdate={updateField} dayId={selectedDay} settings={settings} />
         </>
       )}
     </ScrollView>
