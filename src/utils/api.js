@@ -1,4 +1,6 @@
-const ANTHROPIC_API_KEY = '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';
+import Constants from 'expo-constants';
+
+const ANTHROPIC_API_KEY = Constants.expoConfig?.extra?.anthropicApiKey || '';
 
 const SYSTEM_PROMPT = `You are an AI travel buddy for Tersius and Suzanne, two Dutch travelers visiting NYC for the first time (March 13-18, 2026). They're staying at Madison LES Hotel on the Lower East Side.
 

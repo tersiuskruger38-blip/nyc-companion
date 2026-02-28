@@ -1,9 +1,15 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
-import { DAYS, WEATHER } from '../data/weather';
-import { ACCENT, DARK, WHITE } from '../theme';
+import { DAYS } from '../data/weather';
+import { WEATHER as STATIC_WEATHER } from '../data/weather';
+import { useAppContext } from '../context/AppContext';
+import { useTheme } from '../theme';
 
-export default function DaySelector({ selectedDay, onSelect }) {
+export default function DaySelector() {
+  const { state, dispatch } = useAppContext();
+  const theme = useTheme();
+  const weather = state.weather || STATIC_WEATHER;
+
   return (
     <FlatList
       horizontal
@@ -12,15 +18,18 @@ export default function DaySelector({ selectedDay, onSelect }) {
       showsHorizontalScrollIndicator={false}
       style={styles.list}
       renderItem={({ item: d }) => {
-        const active = selectedDay === d.id;
+        const active = state.selectedDay === d.id;
         return (
           <TouchableOpacity
-            onPress={() => onSelect(d.id)}
-            style={[styles.chip, active && styles.chipActive]}
+            onPress={() => dispatch({ type: 'SET_SELECTED_DAY', payload: d.id })}
+            style={[styles.chip, { backgroundColor: theme.cardBg }, active && { backgroundColor: theme.accent, shadowOpacity: 0.3, shadowColor: theme.accent, elevation: 3 }]}
+            accessibilityRole="button"
+            accessibilityLabel={`${d.label}: ${d.date}`}
+            accessibilityState={{ selected: active }}
           >
-            <Text style={[styles.label, active && styles.labelActive]}>{d.label}</Text>
-            <Text style={[styles.sub, active && styles.subActive]}>
-              {d.date.split(', ')[0]} {WEATHER[d.id]?.icon}
+            <Text style={[styles.label, { color: theme.text }, active && { fontWeight: '700', color: '#FFFFFF' }]}>{d.label}</Text>
+            <Text style={[styles.sub, { color: theme.text }, active && { color: '#FFFFFF' }]}>
+              {d.date.split(', ')[0]} {weather[d.id]?.icon}
             </Text>
           </TouchableOpacity>
         );
@@ -36,21 +45,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 12,
-    backgroundColor: WHITE,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
   },
-  chipActive: {
-    backgroundColor: ACCENT,
-    shadowOpacity: 0.3,
-    shadowColor: ACCENT,
-    elevation: 3,
-  },
-  label: { fontSize: 13, fontWeight: '500', color: DARK },
-  labelActive: { fontWeight: '700', color: WHITE },
-  sub: { fontSize: 11, opacity: 0.8, marginTop: 1, color: DARK },
-  subActive: { color: WHITE },
+  label: { fontSize: 13, fontWeight: '500' },
+  sub: { fontSize: 11, opacity: 0.8, marginTop: 1 },
 });

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,14 +10,8 @@ import StatsScreen from '../screens/StatsScreen';
 import GuideScreen from '../screens/GuideScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import ChatOverlay from '../components/ChatOverlay';
-import { initialActivities } from '../data/activities';
-import { ACCENT, DARK, GRAY, WHITE } from '../theme';
-import {
-  saveActivities, loadActivities,
-  saveExpenses, loadExpenses,
-  saveSettings, loadSettings,
-  DEFAULT_SETTINGS,
-} from '../utils/storage';
+import { useAppContext } from '../context/AppContext';
+import { useTheme } from '../theme';
 
 const Tab = createBottomTabNavigator();
 
@@ -32,10 +26,11 @@ const TAB_ICONS = {
 };
 
 function Header() {
+  const theme = useTheme();
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, { backgroundColor: theme.headerBg }]}>
       <View>
-        <Text style={styles.headerTitle}>NYC <Text style={{ color: ACCENT }}>Companion</Text></Text>
+        <Text style={[styles.headerTitle, { color: theme.headerText }]}>NYC <Text style={{ color: theme.accent }}>Companion</Text></Text>
         <Text style={styles.headerSub}>Mar 13–18, 2026 · Tersius & Suzanne</Text>
       </View>
       <View style={styles.headerRight}>
@@ -47,37 +42,13 @@ function Header() {
 }
 
 export default function TabNavigator() {
-  const [activities, setActivities] = useState(initialActivities);
-  const [selectedDay, setSelectedDay] = useState(0);
-  const [expenses, setExpenses] = useState([]);
-  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [chatOpen, setChatOpen] = useState(false);
-  const loaded = useRef(false);
   const insets = useSafeAreaInsets();
-
-  // Load persisted state on mount
-  useEffect(() => {
-    (async () => {
-      const [savedActs, savedExp, savedSettings] = await Promise.all([
-        loadActivities(),
-        loadExpenses(),
-        loadSettings(),
-      ]);
-      if (savedActs) setActivities(savedActs);
-      if (savedExp) setExpenses(savedExp);
-      if (savedSettings) setSettings(savedSettings);
-      loaded.current = true;
-    })();
-  }, []);
-
-  // Persist on changes (skip initial load)
-  useEffect(() => { if (loaded.current) saveActivities(activities); }, [activities]);
-  useEffect(() => { if (loaded.current) saveExpenses(expenses); }, [expenses]);
-  useEffect(() => { if (loaded.current) saveSettings(settings); }, [settings]);
+  const theme = useTheme();
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={{ paddingTop: insets.top, backgroundColor: DARK }}>
+    <View style={{ flex: 1, backgroundColor: theme.bg }}>
+      <View style={{ paddingTop: insets.top, backgroundColor: theme.headerBg }}>
         <Header />
       </View>
       <Tab.Navigator
@@ -86,75 +57,52 @@ export default function TabNavigator() {
           tabBarIcon: ({ focused }) => (
             <Text style={{ fontSize: 20 }}>{TAB_ICONS[route.name]}</Text>
           ),
-          tabBarActiveTintColor: ACCENT,
-          tabBarInactiveTintColor: GRAY,
+          tabBarActiveTintColor: theme.accent,
+          tabBarInactiveTintColor: theme.textSecondary,
           tabBarLabelStyle: { fontSize: 9, fontWeight: '600' },
           tabBarStyle: {
-            backgroundColor: WHITE,
-            borderTopColor: '#E5E7EB',
+            backgroundColor: theme.surface,
+            borderTopColor: theme.border,
             paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
             height: 56 + (insets.bottom > 0 ? insets.bottom : 8),
           },
         })}
       >
-        <Tab.Screen name="Itinerary">
-          {() => (
-            <ItineraryScreen
-              activities={activities}
-              setActivities={setActivities}
-              selectedDay={selectedDay}
-              setSelectedDay={setSelectedDay}
-              settings={settings}
-            />
-          )}
-        </Tab.Screen>
+        <Tab.Screen name="Itinerary" component={ItineraryScreen} />
         <Tab.Screen name="Places" component={PlacesScreen} />
         <Tab.Screen name="Events" component={EventsScreen} />
         <Tab.Screen name="Flights" component={FlightsScreen} />
-        <Tab.Screen name="Stats">
-          {() => (
-            <StatsScreen
-              activities={activities}
-              expenses={expenses}
-              setExpenses={setExpenses}
-            />
-          )}
-        </Tab.Screen>
+        <Tab.Screen name="Stats" component={StatsScreen} />
         <Tab.Screen name="Guide" component={GuideScreen} />
-        <Tab.Screen name="Settings">
-          {() => (
-            <SettingsScreen
-              settings={settings}
-              setSettings={setSettings}
-            />
-          )}
-        </Tab.Screen>
+        <Tab.Screen name="Settings" component={SettingsScreen} />
       </Tab.Navigator>
 
       {/* Chat FAB */}
       <TouchableOpacity
-        style={[styles.fab, { bottom: 64 + (insets.bottom > 0 ? insets.bottom : 8) }]}
+        style={[styles.fab, { bottom: 64 + (insets.bottom > 0 ? insets.bottom : 8), backgroundColor: theme.accent, shadowColor: theme.accent }]}
         activeOpacity={0.8}
         onPress={() => setChatOpen(true)}
+        accessibilityRole="button"
+        accessibilityLabel="Open AI chat"
+        accessibilityHint="Opens the AI travel buddy chat overlay"
       >
         <Text style={{ fontSize: 24 }}>💬</Text>
       </TouchableOpacity>
 
-      <ChatOverlay visible={chatOpen} onClose={() => setChatOpen(false)} settings={settings} />
+      <ChatOverlay visible={chatOpen} onClose={() => setChatOpen(false)} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: DARK,
     paddingHorizontal: 20,
     paddingVertical: 14,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  headerTitle: { fontSize: 20, fontWeight: '800', color: WHITE },
+  headerTitle: { fontSize: 20, fontWeight: '800' },
   headerSub: { fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 2 },
   headerRight: { alignItems: 'flex-end' },
   headerHotel: { fontSize: 11, color: 'rgba(255,255,255,0.7)' },
@@ -164,10 +112,8 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: ACCENT,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: ACCENT,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
