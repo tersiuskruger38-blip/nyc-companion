@@ -17,8 +17,8 @@ function DayProgress({ activities }) {
   return (
     <View style={styles.progress}>
       <View style={styles.progressRow}>
-        <Text style={[styles.progressText, { color: theme.textTertiary }]}>{done}/{all.length} done</Text>
-        <Text style={[styles.progressText, { color: theme.textTertiary }]}>{pct}%</Text>
+        <Text style={[styles.progressText, { color: theme.textSecondary }]}>{done}/{all.length} done</Text>
+        <Text style={[styles.progressText, { color: theme.textSecondary }]}>{pct}%</Text>
       </View>
       <View style={[styles.progressBar, { backgroundColor: theme.border }]}
         accessibilityRole="progressbar"
@@ -50,8 +50,10 @@ function TimeSection({ label, activities, dayId }) {
   return (
     <View style={{ marginBottom: 20 }}>
       <View style={styles.sectionHeader} accessibilityRole="header">
-        <Text style={[styles.sectionLabel, { color: theme.textTertiary }]}>{label}</Text>
-        <Text style={[styles.sectionCount, { color: theme.textSecondary }]}>{activities.length}</Text>
+        <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>{label}</Text>
+        <View style={[styles.sectionCountBadge, { backgroundColor: theme.cardBg }]}>
+          <Text style={[styles.sectionCount, { color: theme.textSecondary }]}>{activities.length}</Text>
+        </View>
       </View>
       {sorted.map(a => (
         <ActivityCard key={a.id} activity={a} onUpdate={onUpdate} onSwap={onSwap} onFieldUpdate={onFieldUpdate} dayId={dayId} />
@@ -86,7 +88,7 @@ export default function ItineraryScreen() {
         <DaySelector />
         <View style={styles.dayHeader}>
           <Text style={[styles.dayTitle, { color: theme.text }]} accessibilityRole="header">{day.title}</Text>
-          <Text style={[styles.dayDate, { color: theme.textTertiary }]}>{day.date}</Text>
+          <Text style={[styles.dayDate, { color: theme.textSecondary }]}>{day.date}</Text>
         </View>
         <WeatherBar />
         <DayProgress activities={da} />
@@ -104,7 +106,6 @@ export default function ItineraryScreen() {
         )}
       </ScrollView>
 
-      {/* FAB to add activity */}
       <TouchableOpacity
         style={[styles.addFab, { backgroundColor: theme.accent }]}
         onPress={() => setShowAddModal(true)}
@@ -127,33 +128,34 @@ export default function ItineraryScreen() {
 const styles = StyleSheet.create({
   container: { padding: 16, paddingBottom: 100 },
   dayHeader: { marginTop: 8, marginBottom: 12 },
-  dayTitle: { fontSize: 22, fontWeight: '800' },
-  dayDate: { fontSize: 14, marginTop: 2 },
+  dayTitle: { fontSize: 20, fontWeight: '700' },
+  dayDate: { fontSize: 13, marginTop: 2 },
   progress: { marginBottom: 16 },
   progressRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
-  progressText: { fontSize: 12 },
-  progressBar: { height: 6, borderRadius: 3, overflow: 'hidden' },
-  progressFill: { height: '100%', borderRadius: 3 },
-  sectionHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-  sectionLabel: { fontWeight: '700', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 },
-  sectionCount: { fontSize: 12, marginLeft: 8 },
+  progressText: { fontSize: 11 },
+  progressBar: { height: 4, borderRadius: 2, overflow: 'hidden' },
+  progressFill: { height: '100%', borderRadius: 2 },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  sectionLabel: { fontWeight: '600', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 },
+  sectionCountBadge: { marginLeft: 8, paddingHorizontal: 6, paddingVertical: 1, borderRadius: 4 },
+  sectionCount: { fontSize: 11, fontWeight: '600' },
   empty: { alignItems: 'center', padding: 48 },
-  emptyText: { fontSize: 15, fontWeight: '500' },
+  emptyText: { fontSize: 14 },
   emptyHint: { fontSize: 13, marginTop: 4 },
   addFab: {
     position: 'absolute',
     bottom: 20,
     left: 16,
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
     shadowRadius: 6,
-    elevation: 6,
+    elevation: 4,
   },
-  addFabText: { fontSize: 28, fontWeight: '600', color: '#FFFFFF', marginTop: -2 },
+  addFabText: { fontSize: 26, fontWeight: '500', color: '#FFFFFF', marginTop: -2 },
 });

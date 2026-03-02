@@ -26,6 +26,12 @@ export default {
     web: {
       favicon: "./assets/favicon.png",
     },
+    updates: {
+      url: "https://u.expo.dev/245b6ad6-3c9a-44a2-b614-c312237c0dc8",
+    },
+    runtimeVersion: {
+      policy: "appVersion",
+    },
     plugins: ["expo-notifications"],
     extra: {
       anthropicApiKey: process.env.ANTHROPIC_API_KEY,

@@ -64,14 +64,13 @@ export default function EventsScreen() {
             onPress={() => setSelectedDay(d.id)}
             style={[
               styles.chip,
-              { borderColor: theme.border, borderWidth: 1, backgroundColor: 'transparent' },
-              selectedDay === d.id && { backgroundColor: theme.accent, borderColor: theme.accent },
+              { backgroundColor: selectedDay === d.id ? theme.accent : theme.cardBg },
             ]}
             accessibilityRole="button"
             accessibilityLabel={d.label}
             accessibilityState={{ selected: selectedDay === d.id }}
           >
-            <Text style={[styles.chipText, { color: theme.textTertiary }, selectedDay === d.id && { color: '#FFFFFF' }]}>{d.label}</Text>
+            <Text style={[styles.chipText, { color: selectedDay === d.id ? '#FFFFFF' : theme.textSecondary }]}>{d.label}</Text>
           </TouchableOpacity>
         )}
         ItemSeparatorComponent={() => <View style={{ width: 6 }} />}
@@ -99,11 +98,11 @@ export default function EventsScreen() {
               <Text style={[styles.date, { color: theme.textSecondary }]}>{DAYS[ev.day]?.date}</Text>
             </View>
             <Text style={[styles.desc, { color: theme.textTertiary }]}>{ev.description}</Text>
-            <Text style={[styles.meta, { color: theme.textTertiary }]}>{ev.venue} · {ev.time}</Text>
+            <Text style={[styles.meta, { color: theme.textSecondary }]}>{ev.venue} · {ev.time}</Text>
 
             {isExpanded && ev.details && (
-              <View style={[styles.detailsBox, { backgroundColor: theme.isDark ? '#1E293B' : '#EFF6FF' }]}>
-                <Text style={[styles.detailsText, { color: theme.text }]}>{ev.details}</Text>
+              <View style={[styles.detailsBox, { backgroundColor: theme.sectionBg }]}>
+                <Text style={[styles.detailsText, { color: theme.textTertiary }]}>{ev.details}</Text>
               </View>
             )}
 
@@ -116,25 +115,24 @@ export default function EventsScreen() {
                   accessibilityLabel={`Book or get tickets for ${ev.name}`}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Ionicons name="open-outline" size={13} color="#FFFFFF" style={{ marginRight: 5 }} />
+                    <Ionicons name="open-outline" size={12} color="#FFFFFF" style={{ marginRight: 4 }} />
                     <Text style={styles.bookBtnText}>Book / Get Tickets</Text>
                   </View>
                 </TouchableOpacity>
               ) : null}
 
               {isAdded ? (
-                <View style={styles.addedBadge} accessibilityLabel="Already added to itinerary">
+                <View style={[styles.addedBadge, { backgroundColor: '#F0FDF4' }]} accessibilityLabel="Already added to itinerary">
                   <Text style={styles.addedBadgeText}>Added</Text>
                 </View>
               ) : (
                 <TouchableOpacity
-                  style={[styles.addBtn, { borderColor: theme.accent, borderWidth: 1 }]}
+                  style={[styles.addBtn, { backgroundColor: theme.cardBg, borderColor: theme.border, borderWidth: 1 }]}
                   onPress={() => addEventToItinerary(ev)}
                   accessibilityRole="button"
                   accessibilityLabel={`Add ${ev.name} to itinerary`}
-                  accessibilityHint="Adds this event as an activity on the corresponding day"
                 >
-                  <Text style={[styles.addBtnText, { color: theme.accent }]}>+ Add to Itinerary</Text>
+                  <Text style={[styles.addBtnText, { color: theme.text }]}>+ Add to Itinerary</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -162,27 +160,27 @@ export default function EventsScreen() {
 
 const styles = StyleSheet.create({
   container: { padding: 16, paddingBottom: 100 },
-  title: { fontSize: 22, fontWeight: '800', marginBottom: 4 },
-  subtitle: { fontSize: 13, marginBottom: 14 },
-  chip: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 10 },
-  chipText: { fontSize: 12, fontWeight: '600' },
+  title: { fontSize: 20, fontWeight: '700', marginBottom: 4 },
+  subtitle: { fontSize: 12, marginBottom: 14 },
+  chip: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 8 },
+  chipText: { fontSize: 12, fontWeight: '500' },
   empty: { alignItems: 'center', padding: 40 },
   emptyText: {},
-  card: { borderRadius: 16, padding: 14, marginBottom: 10, borderLeftWidth: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 2, elevation: 1 },
+  card: { borderRadius: 12, padding: 14, marginBottom: 8, borderLeftWidth: 3 },
   cardRow: { flexDirection: 'row', alignItems: 'flex-start' },
-  emoji: { fontSize: 24, marginRight: 10 },
-  name: { fontWeight: '700', fontSize: 15 },
-  badgeRow: { flexDirection: 'row', marginTop: 4, flexWrap: 'wrap', alignItems: 'center' },
-  date: { fontSize: 11, marginLeft: 6 },
+  emoji: { fontSize: 22, marginRight: 10 },
+  name: { fontWeight: '600', fontSize: 14 },
+  badgeRow: { flexDirection: 'row', marginTop: 4, flexWrap: 'wrap', alignItems: 'center', gap: 4 },
+  date: { fontSize: 11 },
   desc: { fontSize: 13, lineHeight: 19, marginTop: 8 },
-  meta: { marginTop: 6, fontSize: 12 },
+  meta: { marginTop: 4, fontSize: 11 },
   detailsBox: { marginTop: 10, padding: 10, borderRadius: 8 },
-  detailsText: { fontSize: 13, lineHeight: 20 },
+  detailsText: { fontSize: 12, lineHeight: 18 },
   actionRow: { flexDirection: 'row', marginTop: 10, flexWrap: 'wrap', gap: 8 },
-  bookBtn: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: 20, alignSelf: 'flex-start' },
-  bookBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 12 },
-  addBtn: { paddingVertical: 7, paddingHorizontal: 14, borderRadius: 8, alignSelf: 'flex-start' },
-  addBtnText: { fontWeight: '700', fontSize: 12 },
-  addedBadge: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 8, backgroundColor: '#DCFCE7', alignSelf: 'flex-start' },
-  addedBadgeText: { color: '#16A34A', fontWeight: '700', fontSize: 12 },
+  bookBtn: { paddingVertical: 7, paddingHorizontal: 12, borderRadius: 8, alignSelf: 'flex-start' },
+  bookBtnText: { color: '#FFFFFF', fontWeight: '600', fontSize: 12 },
+  addBtn: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 8, alignSelf: 'flex-start' },
+  addBtnText: { fontWeight: '500', fontSize: 12 },
+  addedBadge: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 8, alignSelf: 'flex-start' },
+  addedBadgeText: { color: '#16A34A', fontWeight: '600', fontSize: 12 },
 });

@@ -1,14 +1,14 @@
 import { useColorScheme } from 'react-native';
 import { useAppContext } from './context/AppContext';
 
-// New palette — deep blue primary, orange for starred/priority only
+// Clean minimal palette — muted blue accent, white-forward design
 export const ACCENT = "#2563EB";
-export const ACCENT_LIGHT = "#DBEAFE";
+export const ACCENT_LIGHT = "#EFF6FF";
 export const ACCENT_WARM = "#F97316";
 export const GREEN = "#22C55E";
 export const GRAY = "#9CA3AF";
 export const DARK = "#1F2937";
-export const LIGHT_BG = "#FAFAF9";
+export const LIGHT_BG = "#FFFFFF";
 export const WHITE = "#FFFFFF";
 
 const lightTheme = {
@@ -16,19 +16,18 @@ const lightTheme = {
   accentLight: ACCENT_LIGHT,
   accentWarm: ACCENT_WARM,
   green: GREEN,
-  bg: '#FAFAF9',
+  bg: '#FFFFFF',
   surface: '#FFFFFF',
-  cardBg: '#FFFFFF',
-  text: '#1F2937',
+  cardBg: '#F9FAFB',
+  text: '#111827',
   textSecondary: '#9CA3AF',
   textTertiary: '#6B7280',
-  border: '#E5E7EB',
-  headerBg: '#0F172A',
-  headerGradient: '#1E293B',
-  headerText: '#FFFFFF',
-  inputBg: '#FFFFFF',
+  border: '#F3F4F6',
+  headerBg: '#FFFFFF',
+  headerText: '#111827',
+  inputBg: '#F9FAFB',
   inputBorder: '#E5E7EB',
-  sectionBg: '#F3F4F6',
+  sectionBg: '#F9FAFB',
   isDark: false,
 };
 
@@ -44,8 +43,7 @@ const darkTheme = {
   textSecondary: '#9CA3AF',
   textTertiary: '#D1D5DB',
   border: '#374151',
-  headerBg: '#0F172A',
-  headerGradient: '#1E293B',
+  headerBg: '#111827',
   headerText: '#F9FAFB',
   inputBg: '#374151',
   inputBorder: '#4B5563',

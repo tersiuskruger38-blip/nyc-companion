@@ -56,7 +56,7 @@ export async function sendChatMessage(userMessage, conversationHistory = [], set
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6-20250514',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 1024,
         system: systemPrompt,
         messages,
@@ -115,7 +115,7 @@ Suggest ONE specific replacement in a DIFFERENT category. Consider time of day a
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6-20250514',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 300,
         system: 'You are an NYC activity recommender. Respond with valid JSON only, no markdown or extra text.',
         messages: [{ role: 'user', content: prompt }],

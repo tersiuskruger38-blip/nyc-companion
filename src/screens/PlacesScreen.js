@@ -22,15 +22,9 @@ const PRIORITIES = [
   { id: 'if-time', label: 'If Time' },
 ];
 const PRIORITY_ORDER = { 'must-visit': 0, 'recommended': 1, 'if-time': 2 };
-const PRIORITY_COLORS = {
-  'must-visit': { bg: '#DBEAFE', text: '#1D4ED8' },
-  'recommended': { bg: '#FEF3C7', text: '#92400E' },
-  'if-time': { bg: '#F3F4F6', text: '#6B7280' },
-};
 
 function PlaceCard({ p, isExpanded, onToggle, onVisit, theme }) {
   const cat = CATEGORIES[p.category] || CATEGORIES.sightseeing;
-  const prioStyle = PRIORITY_COLORS[p.priority];
   return (
     <TouchableOpacity
       activeOpacity={0.7}
@@ -45,9 +39,9 @@ function PlaceCard({ p, isExpanded, onToggle, onVisit, theme }) {
         <View style={{ flex: 1 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={[styles.cardName, { color: theme.text }]}>{p.name}</Text>
-            {p.priority === 'must-visit' && prioStyle && (
-              <View style={[styles.priorityBadge, { backgroundColor: prioStyle.bg }]}>
-                <Text style={[styles.priorityBadgeText, { color: prioStyle.text }]}>Must Visit</Text>
+            {p.priority === 'must-visit' && (
+              <View style={[styles.priorityBadge, { backgroundColor: theme.accentLight }]}>
+                <Text style={[styles.priorityBadgeText, { color: theme.accent }]}>Must Visit</Text>
               </View>
             )}
           </View>
@@ -57,7 +51,7 @@ function PlaceCard({ p, isExpanded, onToggle, onVisit, theme }) {
             <Text style={[styles.neighborhood, { color: theme.textSecondary }]}>{p.neighborhood}</Text>
           </View>
         </View>
-        {p.status === 'visited' && <Text style={{ fontSize: 18, color: theme.green }} accessibilityLabel="Visited">Done</Text>}
+        {p.status === 'visited' && <Text style={{ fontSize: 13, color: theme.green, fontWeight: '600' }}>Done</Text>}
       </View>
       {isExpanded && (
         <View style={[styles.expandedSection, { borderTopColor: theme.border }]}>
@@ -72,12 +66,12 @@ function PlaceCard({ p, isExpanded, onToggle, onVisit, theme }) {
             </TouchableOpacity>
           )}
           <TouchableOpacity
-            style={[styles.visitBtn, { backgroundColor: p.status === 'visited' ? '#DCFCE7' : '#22C55E' }]}
+            style={[styles.visitBtn, { backgroundColor: p.status === 'visited' ? '#F0FDF4' : theme.green }]}
             onPress={onVisit}
             accessibilityRole="button"
             accessibilityLabel={p.status === 'visited' ? 'Mark as not visited' : 'Mark as visited'}
           >
-            <Text style={[styles.visitBtnText, p.status === 'visited' && styles.visitedBtnText]}>
+            <Text style={[styles.visitBtnText, p.status === 'visited' && { color: theme.green }]}>
               {p.status === 'visited' ? 'Unvisit' : 'Visited'}
             </Text>
           </TouchableOpacity>
@@ -116,14 +110,13 @@ export default function PlacesScreen() {
       onPress={() => onPress(item.id)}
       style={[
         styles.filterChip,
-        { borderColor: theme.border, borderWidth: 1, backgroundColor: 'transparent' },
-        activeId === item.id && { backgroundColor: activeColor || theme.accent, borderColor: activeColor || theme.accent },
+        { backgroundColor: activeId === item.id ? (activeColor || theme.accent) : theme.cardBg },
       ]}
       accessibilityRole="button"
       accessibilityLabel={`Filter: ${item.label}`}
       accessibilityState={{ selected: activeId === item.id }}
     >
-      <Text style={[styles.filterText, { color: theme.textTertiary }, activeId === item.id && { color: '#FFFFFF' }]}>{item.label}</Text>
+      <Text style={[styles.filterText, { color: activeId === item.id ? '#FFFFFF' : theme.textSecondary }]}>{item.label}</Text>
     </TouchableOpacity>
   );
 
@@ -137,7 +130,7 @@ export default function PlacesScreen() {
         onChangeText={setSearch}
         placeholder="Search places or neighborhoods..."
         placeholderTextColor={theme.textSecondary}
-        style={[styles.searchInput, { backgroundColor: theme.cardBg, borderColor: theme.inputBorder, color: theme.text }]}
+        style={[styles.searchInput, { backgroundColor: theme.cardBg, borderColor: theme.border, color: theme.text }]}
         accessibilityLabel="Search places"
       />
 
@@ -198,25 +191,23 @@ export default function PlacesScreen() {
 
 const styles = StyleSheet.create({
   container: { padding: 16, paddingBottom: 100 },
-  title: { fontSize: 22, fontWeight: '800', marginBottom: 4 },
-  subtitle: { fontSize: 13, marginBottom: 12 },
+  title: { fontSize: 20, fontWeight: '700', marginBottom: 4 },
+  subtitle: { fontSize: 12, marginBottom: 12 },
   searchInput: { padding: 12, borderRadius: 10, borderWidth: 1, fontSize: 14, marginBottom: 10 },
-  filterChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10 },
-  filterText: { fontSize: 12, fontWeight: '600' },
-  count: { fontSize: 12, marginBottom: 10 },
-  card: { borderRadius: 16, padding: 12, marginBottom: 8, borderLeftWidth: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 2, elevation: 1 },
+  filterChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
+  filterText: { fontSize: 12, fontWeight: '500' },
+  count: { fontSize: 11, marginBottom: 10 },
+  card: { borderRadius: 12, padding: 12, marginBottom: 8, borderLeftWidth: 3 },
   cardRow: { flexDirection: 'row', alignItems: 'center' },
-  cardEmoji: { fontSize: 22, marginRight: 10 },
-  cardName: { fontWeight: '700', fontSize: 14 },
-  priorityBadge: { marginLeft: 8, paddingHorizontal: 6, paddingVertical: 1, borderRadius: 6 },
-  priorityBadgeText: { fontSize: 10, fontWeight: '700' },
-  badgeRow: { flexDirection: 'row', marginTop: 3, flexWrap: 'wrap', alignItems: 'center' },
-  neighborhood: { fontSize: 11, marginLeft: 6 },
+  cardEmoji: { fontSize: 20, marginRight: 10 },
+  cardName: { fontWeight: '600', fontSize: 14 },
+  priorityBadge: { marginLeft: 8, paddingHorizontal: 6, paddingVertical: 1, borderRadius: 4 },
+  priorityBadgeText: { fontSize: 10, fontWeight: '600' },
+  badgeRow: { flexDirection: 'row', marginTop: 3, flexWrap: 'wrap', alignItems: 'center', gap: 4 },
+  neighborhood: { fontSize: 11 },
   expandedSection: { marginTop: 10, paddingTop: 10, borderTopWidth: 1 },
   desc: { fontSize: 13, lineHeight: 20 },
   address: { marginTop: 6, fontSize: 12 },
   visitBtn: { marginTop: 10, paddingVertical: 9, borderRadius: 8, alignItems: 'center' },
-  visitedBtn: { backgroundColor: '#DCFCE7' },
   visitBtnText: { fontWeight: '600', fontSize: 13, color: '#FFFFFF' },
-  visitedBtnText: { color: '#22C55E' },
 });

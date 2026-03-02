@@ -29,18 +29,16 @@ const TAB_ICONS = {
 function Header() {
   const theme = useTheme();
   return (
-    <View style={[styles.header, { backgroundColor: theme.headerBg }]}>
+    <View style={[styles.header, { backgroundColor: theme.headerBg, borderBottomWidth: 1, borderBottomColor: theme.border }]}>
       <View>
         <Text style={[styles.headerTitle, { color: theme.headerText }]}>
-          NYC <Text style={{ color: theme.accent }}>Companion</Text>
+          NYC <Text style={{ color: theme.accent, fontWeight: '800' }}>Companion</Text>
         </Text>
-        <Text style={styles.headerSub}>Mar 13–18, 2026 · Tersius & Suzanne</Text>
+        <Text style={[styles.headerSub, { color: theme.textSecondary }]}>Mar 13–18, 2026 · Tersius & Suzanne</Text>
       </View>
-      <View style={styles.headerRight}>
-        <View style={[styles.hotelPill, { backgroundColor: 'rgba(255,255,255,0.1)' }]}>
-          <Text style={styles.hotelPillText}>Madison LES</Text>
-          <Text style={styles.hotelPillSub}>Lower East Side</Text>
-        </View>
+      <View style={[styles.hotelPill, { backgroundColor: theme.cardBg }]}>
+        <Text style={[styles.hotelPillText, { color: theme.text }]}>Madison LES</Text>
+        <Text style={[styles.hotelPillSub, { color: theme.textSecondary }]}>Lower East Side</Text>
       </View>
     </View>
   );
@@ -55,7 +53,6 @@ export default function TabNavigator() {
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
       <View style={{ paddingTop: insets.top, backgroundColor: theme.headerBg }}>
         <Header />
-        <View style={{ height: 1, backgroundColor: theme.accent }} />
       </View>
       <Tab.Navigator
         screenOptions={({ route }) => ({
@@ -63,14 +60,11 @@ export default function TabNavigator() {
           tabBarIcon: ({ focused, color }) => {
             const iconSet = TAB_ICONS[route.name];
             return (
-              <View style={{ alignItems: 'center' }}>
-                <Ionicons
-                  name={focused ? iconSet.name : iconSet.outline}
-                  size={22}
-                  color={color}
-                />
-                {focused && <View style={[styles.tabDot, { backgroundColor: theme.accent }]} />}
-              </View>
+              <Ionicons
+                name={focused ? iconSet.name : iconSet.outline}
+                size={21}
+                color={color}
+              />
             );
           },
           tabBarActiveTintColor: theme.accent,
@@ -80,7 +74,7 @@ export default function TabNavigator() {
             backgroundColor: theme.surface,
             borderTopColor: theme.border,
             paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
-            height: 60 + (insets.bottom > 0 ? insets.bottom : 8),
+            height: 56 + (insets.bottom > 0 ? insets.bottom : 8),
           },
         })}
       >
@@ -95,14 +89,14 @@ export default function TabNavigator() {
 
       {/* Chat FAB */}
       <TouchableOpacity
-        style={[styles.fab, { bottom: 68 + (insets.bottom > 0 ? insets.bottom : 8), backgroundColor: theme.accent, shadowColor: theme.accent }]}
+        style={[styles.fab, { bottom: 64 + (insets.bottom > 0 ? insets.bottom : 8), backgroundColor: theme.accent }]}
         activeOpacity={0.8}
         onPress={() => setChatOpen(true)}
         accessibilityRole="button"
         accessibilityLabel="Open AI chat"
         accessibilityHint="Opens the AI travel buddy chat overlay"
       >
-        <Ionicons name="chatbubble-ellipses" size={24} color="#FFFFFF" />
+        <Ionicons name="chatbubble-ellipses" size={22} color="#FFFFFF" />
       </TouchableOpacity>
 
       <ChatOverlay visible={chatOpen} onClose={() => setChatOpen(false)} />
@@ -118,34 +112,28 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  headerTitle: { fontSize: 22, fontWeight: '800' },
-  headerSub: { fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 2 },
-  headerRight: { alignItems: 'flex-end' },
+  headerTitle: { fontSize: 20, fontWeight: '700' },
+  headerSub: { fontSize: 11, marginTop: 2 },
   hotelPill: {
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 8,
     alignItems: 'flex-end',
   },
-  hotelPillText: { fontSize: 12, color: 'rgba(255,255,255,0.9)', fontWeight: '600' },
-  hotelPillSub: { fontSize: 10, color: 'rgba(255,255,255,0.5)', marginTop: 1 },
-  tabDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    marginTop: 3,
-  },
+  hotelPillText: { fontSize: 11, fontWeight: '600' },
+  hotelPillSub: { fontSize: 10, marginTop: 1 },
   fab: {
     position: 'absolute',
     right: 16,
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 4,
   },
 });

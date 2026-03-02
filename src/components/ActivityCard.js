@@ -18,28 +18,27 @@ function ActivityCardHeader({ activity, cat, isDone, isSkipped, isStarred, hasBa
       <Text style={styles.emoji} accessibilityLabel={cat.label}>{cat.emoji}</Text>
       <View style={styles.info}>
         <View style={styles.nameRow}>
-          {isStarred && <Ionicons name="star" size={14} color={theme.accentWarm} style={{ marginRight: 4 }} />}
+          {isStarred && <Ionicons name="star" size={13} color={theme.accentWarm} style={{ marginRight: 4 }} />}
           <Text style={[styles.name, { color: theme.text }, isSkipped && styles.strikethrough]}>{activity.name}</Text>
-          {isDone && <Ionicons name="checkmark-circle" size={16} color={theme.green} style={{ marginLeft: 4 }} />}
-          {isSkipped && <Text style={{ fontSize: 14, opacity: 0.5, marginLeft: 4 }} accessibilityLabel="Skipped">Skip</Text>}
+          {isDone && <Ionicons name="checkmark-circle" size={15} color={theme.green} style={{ marginLeft: 4 }} />}
         </View>
         <View style={styles.badges}>
           <CatBadge cat={activity.category} />
           <PriceBadge price={activity.price} />
-          <Text style={[styles.duration, { color: theme.textTertiary }]}>{activity.duration}</Text>
+          <Text style={[styles.duration, { color: theme.textSecondary }]}>{activity.duration}</Text>
           {activity.bookingUrl ? (
-            <View style={styles.bookingBadge}>
-              <Text style={styles.bookingBadgeText}>Bookable</Text>
+            <View style={[styles.bookingBadge, { backgroundColor: theme.accentLight }]}>
+              <Text style={[styles.bookingBadgeText, { color: theme.accent }]}>Bookable</Text>
             </View>
           ) : null}
           {hasBad && (
             <View style={[styles.weatherRisk, { backgroundColor: v.bg }]}>
-              <Text style={[styles.weatherRiskText, { color: v.color }]}>{v.icon} Weather risk</Text>
+              <Text style={[styles.weatherRiskText, { color: v.color }]}>{v.icon} Weather</Text>
             </View>
           )}
         </View>
         {activity.comment ? (
-          <Text style={[styles.commentPreview, { color: theme.textTertiary }]} numberOfLines={1}>{activity.comment}</Text>
+          <Text style={[styles.commentPreview, { color: theme.textSecondary }]} numberOfLines={1}>{activity.comment}</Text>
         ) : null}
       </View>
       <View style={styles.timeWrap}>
@@ -58,7 +57,6 @@ function SwapSection({ activity, dayId, swapping, swapResult, onSwap, onAcceptSw
         disabled={swapping}
         accessibilityRole="button"
         accessibilityLabel="Swap: Find an alternative activity"
-        accessibilityHint="Uses AI to suggest a replacement activity"
       >
         {swapping ? (
           <View style={styles.swapLoading}>
@@ -67,23 +65,23 @@ function SwapSection({ activity, dayId, swapping, swapResult, onSwap, onAcceptSw
           </View>
         ) : (
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="swap-horizontal" size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+            <Ionicons name="swap-horizontal" size={15} color="#FFFFFF" style={{ marginRight: 6 }} />
             <Text style={styles.swapBtnText}>Swap — Find alternative</Text>
           </View>
         )}
       </TouchableOpacity>
 
       {swapResult && (
-        <View style={[styles.swapResult, { backgroundColor: theme.isDark ? '#1E3A5F' : '#EFF6FF', borderColor: theme.isDark ? '#2563EB' : '#BFDBFE' }]}>
+        <View style={[styles.swapResult, { backgroundColor: theme.cardBg, borderColor: theme.border }]}>
           <Text style={[styles.swapResultTitle, { color: theme.accent }]}>AI Suggestion</Text>
           <Text style={[styles.swapResultName, { color: theme.text }]}>{swapResult.name}</Text>
           <Text style={[styles.swapResultDesc, { color: theme.textTertiary }]}>{swapResult.description}</Text>
           {swapResult.reason && (
-            <Text style={[styles.swapResultReason, { color: theme.accent }]}>{swapResult.reason}</Text>
+            <Text style={[styles.swapResultReason, { color: theme.textSecondary }]}>{swapResult.reason}</Text>
           )}
           <View style={styles.swapResultMeta}>
             {swapResult.price && <PriceBadge price={swapResult.price} />}
-            {swapResult.duration && <Text style={[styles.duration, { color: theme.textTertiary }]}>{swapResult.duration}</Text>}
+            {swapResult.duration && <Text style={[styles.duration, { color: theme.textSecondary }]}>{swapResult.duration}</Text>}
           </View>
           <View style={styles.swapActions}>
             <TouchableOpacity
@@ -95,7 +93,7 @@ function SwapSection({ activity, dayId, swapping, swapResult, onSwap, onAcceptSw
               <Text style={styles.swapAcceptText}>Swap it in</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.swapDismiss, { backgroundColor: theme.border }]}
+              style={[styles.swapDismiss, { backgroundColor: theme.sectionBg }]}
               onPress={onDismissSwap}
               accessibilityRole="button"
               accessibilityLabel="Keep original activity"
@@ -112,7 +110,7 @@ function SwapSection({ activity, dayId, swapping, swapResult, onSwap, onAcceptSw
 function CommentSection({ activity, commentDraft, setCommentDraft, editingComment, setEditingComment, onSave, theme }) {
   return (
     <View style={[styles.commentSection, { backgroundColor: theme.sectionBg }]}>
-      <Text style={[styles.commentLabel, { color: theme.text }]}>Your Notes</Text>
+      <Text style={[styles.commentLabel, { color: theme.textTertiary }]}>Notes</Text>
       {editingComment ? (
         <View>
           <TextInput
@@ -135,12 +133,12 @@ function CommentSection({ activity, commentDraft, setCommentDraft, editingCommen
               <Text style={styles.commentSaveText}>Save</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.commentCancel, { backgroundColor: theme.border }]}
+              style={[styles.commentCancel, { backgroundColor: theme.sectionBg, borderWidth: 1, borderColor: theme.border }]}
               onPress={() => { setEditingComment(false); setCommentDraft(activity.comment || ''); }}
               accessibilityRole="button"
               accessibilityLabel="Cancel editing note"
             >
-              <Text style={[styles.commentCancelText, { color: theme.text }]}>Cancel</Text>
+              <Text style={[styles.commentCancelText, { color: theme.textTertiary }]}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -152,7 +150,7 @@ function CommentSection({ activity, commentDraft, setCommentDraft, editingCommen
           accessibilityLabel={activity.comment ? `Note: ${activity.comment}. Tap to edit` : 'Tap to add a note'}
         >
           <Text style={activity.comment ? [styles.commentText, { color: theme.textTertiary }] : [styles.commentPlaceholder, { color: theme.textSecondary }]}>
-            {activity.comment || 'Tap to add a note (booked, need to book, tips...)'}
+            {activity.comment || 'Tap to add a note...'}
           </Text>
         </TouchableOpacity>
       )}
@@ -164,23 +162,23 @@ function ActivityCardActions({ activity, isDone, isSkipped, isStarred, onUpdate,
   return (
     <View style={styles.buttons}>
       <TouchableOpacity
-        style={[styles.starBtn, { backgroundColor: isStarred ? (theme.isDark ? '#7C2D12' : '#FFF7ED') : theme.sectionBg }]}
+        style={[styles.starBtn, { backgroundColor: isStarred ? '#FFF7ED' : theme.sectionBg }]}
         onPress={onToggleStar}
         accessibilityRole="button"
         accessibilityLabel={isStarred ? 'Remove star from activity' : 'Star this activity'}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Ionicons name={isStarred ? 'star' : 'star-outline'} size={14} color={isStarred ? theme.accentWarm : theme.textTertiary} style={{ marginRight: 4 }} />
-          <Text style={[styles.starBtnText, { color: isStarred ? theme.accentWarm : theme.textTertiary }]}>{isStarred ? 'Starred' : 'Star'}</Text>
+          <Ionicons name={isStarred ? 'star' : 'star-outline'} size={13} color={isStarred ? theme.accentWarm : theme.textSecondary} style={{ marginRight: 3 }} />
+          <Text style={[styles.starBtnText, { color: isStarred ? theme.accentWarm : theme.textSecondary }]}>{isStarred ? 'Starred' : 'Star'}</Text>
         </View>
       </TouchableOpacity>
       <TouchableOpacity
-        style={[styles.btn, { backgroundColor: isDone ? '#DCFCE7' : '#22C55E' }]}
+        style={[styles.btn, { backgroundColor: isDone ? '#F0FDF4' : theme.green }]}
         onPress={() => onUpdate(activity.id, isDone ? 'upcoming' : 'done')}
         accessibilityRole="button"
         accessibilityLabel={isDone ? 'Mark as not done' : 'Mark as done'}
       >
-        <Text style={[styles.btnText, { color: isDone ? '#22C55E' : '#FFFFFF' }]}>
+        <Text style={[styles.btnText, { color: isDone ? theme.green : '#FFFFFF' }]}>
           {isDone ? 'Undo' : 'Done'}
         </Text>
       </TouchableOpacity>
@@ -190,7 +188,7 @@ function ActivityCardActions({ activity, isDone, isSkipped, isStarred, onUpdate,
         accessibilityRole="button"
         accessibilityLabel={isSkipped ? 'Unskip activity' : 'Skip this activity'}
       >
-        <Text style={[styles.btnText, { color: theme.textTertiary }]}>
+        <Text style={[styles.btnText, { color: theme.textSecondary }]}>
           {isSkipped ? 'Undo' : 'Skip'}
         </Text>
       </TouchableOpacity>
@@ -263,11 +261,10 @@ export default function ActivityCard({ activity, onUpdate, onSwap, onFieldUpdate
         styles.card,
         {
           backgroundColor: theme.cardBg,
-          borderLeftColor: isDone ? '#22C55E' : isSkipped ? theme.textSecondary : (isStarred ? theme.accentWarm : cat.color),
+          borderLeftColor: isDone ? theme.green : isSkipped ? theme.textSecondary : (isStarred ? theme.accentWarm : cat.color),
         },
-        isStarred && !isDone && !isSkipped && { backgroundColor: theme.isDark ? '#1E3A5F' : '#EFF6FF' },
-        expanded && styles.cardExpanded,
-        isSkipped && { opacity: 0.55 },
+        isStarred && !isDone && !isSkipped && { backgroundColor: '#FFFBF5' },
+        isSkipped && { opacity: 0.5 },
       ]}
       accessibilityRole="button"
       accessibilityLabel={`${activity.name}, ${cat.label}, ${activity.time}, ${isDone ? 'completed' : isSkipped ? 'skipped' : 'upcoming'}`}
@@ -301,7 +298,7 @@ export default function ActivityCard({ activity, onUpdate, onSwap, onFieldUpdate
                 accessibilityLabel="Book or reserve this activity"
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Ionicons name="open-outline" size={14} color="#FFFFFF" style={{ marginRight: 6 }} />
+                  <Ionicons name="open-outline" size={13} color="#FFFFFF" style={{ marginRight: 6 }} />
                   <Text style={styles.bookingBtnText}>Book / Reserve</Text>
                 </View>
               </TouchableOpacity>
@@ -313,12 +310,12 @@ export default function ActivityCard({ activity, onUpdate, onSwap, onFieldUpdate
                 accessibilityRole="link"
                 accessibilityLabel={`Open ${activity.address} in maps`}
               >
-                <Text style={styles.address}>{activity.address}</Text>
+                <Text style={[styles.address, { color: theme.accent }]}>{activity.address}</Text>
               </TouchableOpacity>
             )}
             {activity.notes && (
-              <View style={[styles.notesBox, { backgroundColor: theme.isDark ? '#1E3A5F' : '#EFF6FF' }]}>
-                <Text style={[styles.notesText, { color: theme.isDark ? '#93C5FD' : '#1D4ED8' }]}>{activity.notes}</Text>
+              <View style={[styles.notesBox, { backgroundColor: theme.accentLight }]}>
+                <Text style={[styles.notesText, { color: theme.accent }]}>{activity.notes}</Text>
               </View>
             )}
 
@@ -352,71 +349,61 @@ export default function ActivityCard({ activity, onUpdate, onSwap, onFieldUpdate
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 16,
+    borderRadius: 12,
     padding: 14,
-    marginBottom: 10,
+    marginBottom: 8,
     borderLeftWidth: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  cardExpanded: {
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
   },
   row: { flexDirection: 'row', alignItems: 'center' },
-  emoji: { fontSize: 24, marginRight: 10 },
+  emoji: { fontSize: 22, marginRight: 10 },
   info: { flex: 1 },
   nameRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' },
-  name: { fontWeight: '700', fontSize: 15, marginRight: 6 },
+  name: { fontWeight: '600', fontSize: 14 },
   strikethrough: { textDecorationLine: 'line-through' },
-  badges: { flexDirection: 'row', alignItems: 'center', marginTop: 4, flexWrap: 'wrap' },
-  duration: { fontSize: 12, marginLeft: 6 },
-  bookingBadge: { marginLeft: 6, paddingHorizontal: 6, paddingVertical: 1, borderRadius: 6, backgroundColor: '#DBEAFE' },
-  bookingBadgeText: { fontSize: 10, fontWeight: '600', color: '#1D4ED8' },
-  weatherRisk: { paddingHorizontal: 6, paddingVertical: 1, borderRadius: 6, marginLeft: 6 },
-  weatherRiskText: { fontSize: 11, fontWeight: '600' },
+  badges: { flexDirection: 'row', alignItems: 'center', marginTop: 4, flexWrap: 'wrap', gap: 4 },
+  duration: { fontSize: 11, marginLeft: 2 },
+  bookingBadge: { paddingHorizontal: 6, paddingVertical: 1, borderRadius: 4 },
+  bookingBadgeText: { fontSize: 10, fontWeight: '600' },
+  weatherRisk: { paddingHorizontal: 6, paddingVertical: 1, borderRadius: 4 },
+  weatherRiskText: { fontSize: 10, fontWeight: '600' },
   commentPreview: { fontSize: 11, marginTop: 3, fontStyle: 'italic' },
   timeWrap: { alignItems: 'flex-end' },
-  time: { fontSize: 14, fontWeight: '700' },
+  time: { fontSize: 13, fontWeight: '700' },
   expandedSection: { marginTop: 12, paddingTop: 12, borderTopWidth: 1 },
-  description: { fontSize: 14, lineHeight: 21 },
-  address: { marginTop: 8, fontSize: 13, color: '#2563EB' },
+  description: { fontSize: 13, lineHeight: 20 },
+  address: { marginTop: 8, fontSize: 12 },
   notesBox: { marginTop: 8, padding: 8, borderRadius: 8 },
-  notesText: { fontSize: 13 },
-  bookingBtn: { marginTop: 10, borderRadius: 20, padding: 12, alignItems: 'center' },
-  bookingBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 13 },
+  notesText: { fontSize: 12 },
+  bookingBtn: { marginTop: 10, borderRadius: 8, padding: 10, alignItems: 'center' },
+  bookingBtnText: { color: '#FFFFFF', fontWeight: '600', fontSize: 13 },
   commentSection: { marginTop: 10, borderRadius: 8, padding: 10 },
-  commentLabel: { fontSize: 12, fontWeight: '700', marginBottom: 6 },
+  commentLabel: { fontSize: 11, fontWeight: '600', marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 },
   commentDisplay: { paddingVertical: 4 },
   commentText: { fontSize: 13, lineHeight: 19 },
   commentPlaceholder: { fontSize: 13, fontStyle: 'italic' },
   commentInput: { fontSize: 13, borderWidth: 1, borderRadius: 8, padding: 10, minHeight: 60, textAlignVertical: 'top' },
   commentBtns: { flexDirection: 'row', marginTop: 8, gap: 8 },
   commentSave: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
-  commentSaveText: { color: '#FFFFFF', fontWeight: '700', fontSize: 12 },
+  commentSaveText: { color: '#FFFFFF', fontWeight: '600', fontSize: 12 },
   commentCancel: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
-  commentCancelText: { fontWeight: '600', fontSize: 12 },
-  buttons: { flexDirection: 'row', marginTop: 12 },
-  starBtn: { paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8, alignItems: 'center', marginRight: 4 },
+  commentCancelText: { fontWeight: '500', fontSize: 12 },
+  buttons: { flexDirection: 'row', marginTop: 12, gap: 6 },
+  starBtn: { paddingVertical: 9, paddingHorizontal: 12, borderRadius: 8, alignItems: 'center' },
   starBtnText: { fontWeight: '600', fontSize: 12 },
-  btn: { flex: 1, paddingVertical: 10, borderRadius: 8, alignItems: 'center', marginHorizontal: 4 },
+  btn: { flex: 1, paddingVertical: 9, borderRadius: 8, alignItems: 'center' },
   btnText: { fontWeight: '600', fontSize: 13 },
-  swapBtn: { marginTop: 10, borderRadius: 8, padding: 12, alignItems: 'center' },
+  swapBtn: { marginTop: 10, borderRadius: 8, padding: 10, alignItems: 'center' },
   swapLoading: { flexDirection: 'row', alignItems: 'center' },
-  swapBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 13 },
-  swapResult: { marginTop: 10, borderRadius: 12, padding: 12, borderWidth: 1 },
-  swapResultTitle: { fontSize: 12, fontWeight: '700', marginBottom: 4 },
-  swapResultName: { fontSize: 15, fontWeight: '800', marginBottom: 4 },
+  swapBtnText: { color: '#FFFFFF', fontWeight: '600', fontSize: 13 },
+  swapResult: { marginTop: 10, borderRadius: 10, padding: 12, borderWidth: 1 },
+  swapResultTitle: { fontSize: 11, fontWeight: '700', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5 },
+  swapResultName: { fontSize: 15, fontWeight: '700', marginBottom: 4 },
   swapResultDesc: { fontSize: 13, lineHeight: 19, marginBottom: 4 },
   swapResultReason: { fontSize: 12, marginBottom: 8, fontStyle: 'italic' },
   swapResultMeta: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-  swapActions: { flexDirection: 'row' },
-  swapAccept: { flex: 1, borderRadius: 8, padding: 10, alignItems: 'center', marginRight: 6 },
-  swapAcceptText: { color: '#FFFFFF', fontWeight: '700', fontSize: 13 },
-  swapDismiss: { flex: 1, borderRadius: 8, padding: 10, alignItems: 'center', marginLeft: 6 },
-  swapDismissText: { fontWeight: '600', fontSize: 13 },
+  swapActions: { flexDirection: 'row', gap: 6 },
+  swapAccept: { flex: 1, borderRadius: 8, padding: 10, alignItems: 'center' },
+  swapAcceptText: { color: '#FFFFFF', fontWeight: '600', fontSize: 13 },
+  swapDismiss: { flex: 1, borderRadius: 8, padding: 10, alignItems: 'center' },
+  swapDismissText: { fontWeight: '500', fontSize: 13 },
 });
