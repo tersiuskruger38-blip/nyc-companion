@@ -16,7 +16,7 @@ export function PriceBadge({ price }) {
   const isFree = price === 'free';
   return (
     <View style={[styles.badge, { backgroundColor: isFree ? '#DCFCE7' : ACCENT_LIGHT }]}>
-      <Text style={[styles.badgeText, { color: isFree ? '#16A34A' : '#B45309' }]}>
+      <Text style={[styles.badgeText, { color: isFree ? '#16A34A' : '#1D4ED8' }]}>
         {PRICE_LABELS[price] || price}
       </Text>
     </View>

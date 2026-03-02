@@ -22,15 +22,20 @@ export default function DaySelector() {
         return (
           <TouchableOpacity
             onPress={() => dispatch({ type: 'SET_SELECTED_DAY', payload: d.id })}
-            style={[styles.chip, { backgroundColor: theme.cardBg }, active && { backgroundColor: theme.accent, shadowOpacity: 0.3, shadowColor: theme.accent, elevation: 3 }]}
+            style={[
+              styles.chip,
+              { borderColor: theme.border, borderWidth: 1, backgroundColor: 'transparent' },
+              active && { backgroundColor: theme.accent, borderColor: theme.accent, shadowOpacity: 0.25, shadowColor: theme.accent, elevation: 3 },
+            ]}
             accessibilityRole="button"
             accessibilityLabel={`${d.label}: ${d.date}`}
             accessibilityState={{ selected: active }}
           >
-            <Text style={[styles.label, { color: theme.text }, active && { fontWeight: '700', color: '#FFFFFF' }]}>{d.label}</Text>
-            <Text style={[styles.sub, { color: theme.text }, active && { color: '#FFFFFF' }]}>
+            <Text style={[styles.label, { color: theme.textTertiary }, active && { fontWeight: '700', color: '#FFFFFF' }]}>{d.label}</Text>
+            <Text style={[styles.sub, { color: theme.textSecondary }, active && { color: 'rgba(255,255,255,0.8)' }]}>
               {d.date.split(', ')[0]} {weather[d.id]?.icon}
             </Text>
+            {active && <View style={styles.activeIndicator} />}
           </TouchableOpacity>
         );
       }}
@@ -44,13 +49,21 @@ const styles = StyleSheet.create({
   chip: {
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 12,
+    borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0,
     shadowRadius: 2,
-    elevation: 1,
+    elevation: 0,
+    alignItems: 'center',
   },
   label: { fontSize: 13, fontWeight: '500' },
-  sub: { fontSize: 11, opacity: 0.8, marginTop: 1 },
+  sub: { fontSize: 11, marginTop: 1 },
+  activeIndicator: {
+    width: 16,
+    height: 2,
+    borderRadius: 1,
+    backgroundColor: 'rgba(255,255,255,0.6)',
+    marginTop: 4,
+  },
 });

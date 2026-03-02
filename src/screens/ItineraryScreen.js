@@ -31,8 +31,9 @@ function DayProgress({ activities }) {
   );
 }
 
-function TimeSection({ label, emoji, activities, dayId }) {
+function TimeSection({ label, activities, dayId }) {
   const { dispatch, state } = useAppContext();
+  const theme = useTheme();
   if (!activities || !activities.length) return null;
   const sorted = [...activities].sort((a, b) => (b.starred ? 1 : 0) - (a.starred ? 1 : 0));
 
@@ -49,9 +50,8 @@ function TimeSection({ label, emoji, activities, dayId }) {
   return (
     <View style={{ marginBottom: 20 }}>
       <View style={styles.sectionHeader} accessibilityRole="header">
-        <Text style={{ fontSize: 18 }} accessibilityLabel={label}>{emoji}</Text>
-        <Text style={styles.sectionLabel}>{label}</Text>
-        <Text style={styles.sectionCount}>{activities.length}</Text>
+        <Text style={[styles.sectionLabel, { color: theme.textTertiary }]}>{label}</Text>
+        <Text style={[styles.sectionCount, { color: theme.textSecondary }]}>{activities.length}</Text>
       </View>
       {sorted.map(a => (
         <ActivityCard key={a.id} activity={a} onUpdate={onUpdate} onSwap={onSwap} onFieldUpdate={onFieldUpdate} dayId={dayId} />
@@ -92,15 +92,14 @@ export default function ItineraryScreen() {
         <DayProgress activities={da} />
         {empty ? (
           <View style={styles.empty}>
-            <Text style={{ fontSize: 48, marginBottom: 12 }} accessibilityLabel="Calendar">🗓️</Text>
             <Text style={[styles.emptyText, { color: theme.textSecondary }]}>No activities yet</Text>
             <Text style={[styles.emptyHint, { color: theme.textSecondary }]}>Tap + to add one</Text>
           </View>
         ) : (
           <>
-            <TimeSection label="Morning" emoji="🌅" activities={da.morning} dayId={selectedDay} />
-            <TimeSection label="Afternoon" emoji="☀️" activities={da.afternoon} dayId={selectedDay} />
-            <TimeSection label="Evening" emoji="🌙" activities={da.evening} dayId={selectedDay} />
+            <TimeSection label="Morning" activities={da.morning} dayId={selectedDay} />
+            <TimeSection label="Afternoon" activities={da.afternoon} dayId={selectedDay} />
+            <TimeSection label="Evening" activities={da.evening} dayId={selectedDay} />
           </>
         )}
       </ScrollView>
@@ -136,8 +135,8 @@ const styles = StyleSheet.create({
   progressBar: { height: 6, borderRadius: 3, overflow: 'hidden' },
   progressFill: { height: '100%', borderRadius: 3 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-  sectionLabel: { fontWeight: '700', fontSize: 14, color: '#1F2937', textTransform: 'uppercase', letterSpacing: 0.5, marginLeft: 8 },
-  sectionCount: { fontSize: 12, color: '#9CA3AF', marginLeft: 8 },
+  sectionLabel: { fontWeight: '700', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 },
+  sectionCount: { fontSize: 12, marginLeft: 8 },
   empty: { alignItems: 'center', padding: 48 },
   emptyText: { fontSize: 15, fontWeight: '500' },
   emptyHint: { fontSize: 13, marginTop: 4 },

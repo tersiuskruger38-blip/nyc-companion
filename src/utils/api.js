@@ -17,7 +17,7 @@ When asked about nearby places, reference their hotel location (Ludlow St, LES) 
 
 Their itinerary:
 Day 0 (Fri Mar 13): Arrive, Explore LES, Tompkins Sq Bagels, Rubirosa pizza
-Day 1 (Sat Mar 14): High Line, Chelsea Market, Little Island, Brooklyn Bridge, DUMBO, rest at hotel, King Dumplings, Fiaschetteria Pistoia
+Day 1 (Sat Mar 14): High Line, Chelsea Market, Little Island, Brooklyn Bridge, DUMBO, rest at hotel, King Dumplings, Nolita walk, Fiaschetteria Pistoia
 Day 2 (Sun Mar 15): Central Park, Top of the Rock, lunch, MoMA (only museum today), Times Square quick stop, Grand Central, Katz's Deli, Comedy Cellar
 Day 3 (Mon Mar 16): Met Museum (only museum today), Central Park upper loop, Levain Bakery, Upper West Side stroll, rest at hotel, Joe's Pizza, Village Vanguard
 Day 4 (Tue Mar 17): St. Patrick's Day Parade, Koreatown lunch, Empire State Building, rest, McSorley's, East Village bar hop
@@ -56,8 +56,8 @@ export async function sendChatMessage(userMessage, conversationHistory = [], set
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 512,
+        model: 'claude-sonnet-4-6-20250514',
+        max_tokens: 1024,
         system: systemPrompt,
         messages,
       }),
@@ -78,7 +78,9 @@ export async function sendChatMessage(userMessage, conversationHistory = [], set
 }
 
 export async function getSwapSuggestion(activity, weather, dayLabel, settings = null) {
-  const prompt = `I need a replacement for this activity because of weather:
+  const hasBadWeather = weather && (weather.rain > 50 || weather.wind > 30);
+
+  const weatherPrompt = `I need a replacement for this activity because of weather:
 
 Activity: ${activity.name} (${activity.category}, ${activity.time}, ${activity.duration})
 Weather: ${weather.label}, ${weather.temp}°C, ${weather.wind} km/h wind, ${weather.rain}% rain chance
@@ -87,8 +89,22 @@ Day: ${dayLabel}
 ${settings?.preferIndoor ? 'I prefer indoor activities.' : ''}
 ${settings?.budgetLevel === 'budget' ? 'Keep it cheap.' : ''}
 
-Suggest ONE specific replacement activity. Reply in this exact JSON format only, no other text:
-{"name":"...","category":"museum|food|entertainment|shopping|sightseeing","time":"${activity.time}","duration":"...","price":"free|$|$$|$$$","description":"...","address":"...","notes":"...","reason":"Why this is a better pick"}`;
+Suggest ONE specific indoor/weather-proof replacement. Reply in this exact JSON format only, no other text:
+{"name":"...","category":"museum|food|entertainment|shopping|sightseeing","time":"${activity.time}","duration":"...","price":"free|$|$$|$$$","description":"...","address":"...","notes":"...","reason":"Why this is a better pick given the weather"}`;
+
+  const generalPrompt = `I want to swap this activity for something different:
+
+Activity: ${activity.name} (${activity.category}, ${activity.time}, ${activity.duration})
+Day: ${dayLabel}
+Weather: ${weather.label}, ${weather.temp}°C
+
+${settings?.preferIndoor ? 'I prefer indoor activities.' : ''}
+${settings?.budgetLevel === 'budget' ? 'Keep it cheap.' : ''}
+
+Suggest ONE specific replacement in a DIFFERENT category. Consider time of day and that we're an active couple in our 30s visiting NYC. Reply in this exact JSON format only, no other text:
+{"name":"...","category":"museum|food|entertainment|shopping|sightseeing","time":"${activity.time}","duration":"...","price":"free|$|$$|$$$","description":"...","address":"...","notes":"...","reason":"Why this is a good alternative"}`;
+
+  const prompt = hasBadWeather ? weatherPrompt : generalPrompt;
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -99,7 +115,7 @@ Suggest ONE specific replacement activity. Reply in this exact JSON format only,
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6-20250514',
         max_tokens: 300,
         system: 'You are an NYC activity recommender. Respond with valid JSON only, no markdown or extra text.',
         messages: [{ role: 'user', content: prompt }],

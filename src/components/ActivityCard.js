@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, Linking, ActivityIndicator, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { CATEGORIES } from '../data/categories';
 import { WEATHER as STATIC_WEATHER, DAYS } from '../data/weather';
 import { getWeatherVerdict } from '../utils/weatherVerdict';
@@ -17,18 +18,18 @@ function ActivityCardHeader({ activity, cat, isDone, isSkipped, isStarred, hasBa
       <Text style={styles.emoji} accessibilityLabel={cat.label}>{cat.emoji}</Text>
       <View style={styles.info}>
         <View style={styles.nameRow}>
-          {isStarred && <Text style={{ fontSize: 14, marginRight: 4 }} accessibilityLabel="Starred">⭐</Text>}
+          {isStarred && <Ionicons name="star" size={14} color={theme.accentWarm} style={{ marginRight: 4 }} />}
           <Text style={[styles.name, { color: theme.text }, isSkipped && styles.strikethrough]}>{activity.name}</Text>
-          {isDone && <Text style={{ fontSize: 16 }} accessibilityLabel="Completed">✅</Text>}
-          {isSkipped && <Text style={{ fontSize: 14, opacity: 0.5 }} accessibilityLabel="Skipped">⏭️</Text>}
+          {isDone && <Ionicons name="checkmark-circle" size={16} color={theme.green} style={{ marginLeft: 4 }} />}
+          {isSkipped && <Text style={{ fontSize: 14, opacity: 0.5, marginLeft: 4 }} accessibilityLabel="Skipped">Skip</Text>}
         </View>
         <View style={styles.badges}>
           <CatBadge cat={activity.category} />
           <PriceBadge price={activity.price} />
-          <Text style={[styles.duration, { color: theme.textTertiary }]}>⏱ {activity.duration}</Text>
+          <Text style={[styles.duration, { color: theme.textTertiary }]}>{activity.duration}</Text>
           {activity.bookingUrl ? (
             <View style={styles.bookingBadge}>
-              <Text style={styles.bookingBadgeText}>🎟 Bookable</Text>
+              <Text style={styles.bookingBadgeText}>Bookable</Text>
             </View>
           ) : null}
           {hasBad && (
@@ -38,7 +39,7 @@ function ActivityCardHeader({ activity, cat, isDone, isSkipped, isStarred, hasBa
           )}
         </View>
         {activity.comment ? (
-          <Text style={[styles.commentPreview, { color: theme.textTertiary }]} numberOfLines={1}>💬 {activity.comment}</Text>
+          <Text style={[styles.commentPreview, { color: theme.textTertiary }]} numberOfLines={1}>{activity.comment}</Text>
         ) : null}
       </View>
       <View style={styles.timeWrap}>
@@ -52,12 +53,12 @@ function SwapSection({ activity, dayId, swapping, swapResult, onSwap, onAcceptSw
   return (
     <>
       <TouchableOpacity
-        style={styles.swapBtn}
+        style={[styles.swapBtn, { backgroundColor: theme.accent }]}
         onPress={onSwap}
         disabled={swapping}
         accessibilityRole="button"
-        accessibilityLabel="AI Swap: Find a better activity based on weather"
-        accessibilityHint="Uses AI to suggest a weather-appropriate replacement"
+        accessibilityLabel="Swap: Find an alternative activity"
+        accessibilityHint="Uses AI to suggest a replacement activity"
       >
         {swapping ? (
           <View style={styles.swapLoading}>
@@ -65,30 +66,33 @@ function SwapSection({ activity, dayId, swapping, swapResult, onSwap, onAcceptSw
             <Text style={styles.swapBtnText}>  Finding alternative...</Text>
           </View>
         ) : (
-          <Text style={styles.swapBtnText}>🔄 AI Swap — Find better activity</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name="swap-horizontal" size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+            <Text style={styles.swapBtnText}>Swap — Find alternative</Text>
+          </View>
         )}
       </TouchableOpacity>
 
       {swapResult && (
-        <View style={styles.swapResult}>
-          <Text style={styles.swapResultTitle}>🤖 AI Suggestion</Text>
+        <View style={[styles.swapResult, { backgroundColor: theme.isDark ? '#1E3A5F' : '#EFF6FF', borderColor: theme.isDark ? '#2563EB' : '#BFDBFE' }]}>
+          <Text style={[styles.swapResultTitle, { color: theme.accent }]}>AI Suggestion</Text>
           <Text style={[styles.swapResultName, { color: theme.text }]}>{swapResult.name}</Text>
           <Text style={[styles.swapResultDesc, { color: theme.textTertiary }]}>{swapResult.description}</Text>
           {swapResult.reason && (
-            <Text style={styles.swapResultReason}>💡 {swapResult.reason}</Text>
+            <Text style={[styles.swapResultReason, { color: theme.accent }]}>{swapResult.reason}</Text>
           )}
           <View style={styles.swapResultMeta}>
             {swapResult.price && <PriceBadge price={swapResult.price} />}
-            {swapResult.duration && <Text style={[styles.duration, { color: theme.textTertiary }]}>⏱ {swapResult.duration}</Text>}
+            {swapResult.duration && <Text style={[styles.duration, { color: theme.textTertiary }]}>{swapResult.duration}</Text>}
           </View>
           <View style={styles.swapActions}>
             <TouchableOpacity
-              style={styles.swapAccept}
+              style={[styles.swapAccept, { backgroundColor: theme.accent }]}
               onPress={onAcceptSwap}
               accessibilityRole="button"
               accessibilityLabel="Accept swap suggestion"
             >
-              <Text style={styles.swapAcceptText}>✓ Swap it in</Text>
+              <Text style={styles.swapAcceptText}>Swap it in</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.swapDismiss, { backgroundColor: theme.border }]}
@@ -108,7 +112,7 @@ function SwapSection({ activity, dayId, swapping, swapResult, onSwap, onAcceptSw
 function CommentSection({ activity, commentDraft, setCommentDraft, editingComment, setEditingComment, onSave, theme }) {
   return (
     <View style={[styles.commentSection, { backgroundColor: theme.sectionBg }]}>
-      <Text style={[styles.commentLabel, { color: theme.text }]}>💬 Your Notes</Text>
+      <Text style={[styles.commentLabel, { color: theme.text }]}>Your Notes</Text>
       {editingComment ? (
         <View>
           <TextInput
@@ -160,12 +164,15 @@ function ActivityCardActions({ activity, isDone, isSkipped, isStarred, onUpdate,
   return (
     <View style={styles.buttons}>
       <TouchableOpacity
-        style={[styles.starBtn, { backgroundColor: theme.isDark ? '#78350F' : '#FEF3C7' }]}
+        style={[styles.starBtn, { backgroundColor: isStarred ? (theme.isDark ? '#7C2D12' : '#FFF7ED') : theme.sectionBg }]}
         onPress={onToggleStar}
         accessibilityRole="button"
         accessibilityLabel={isStarred ? 'Remove star from activity' : 'Star this activity'}
       >
-        <Text style={[styles.starBtnText, { color: theme.isDark ? '#FCD34D' : '#92400E' }]}>{isStarred ? '⭐ Starred' : '☆ Star'}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Ionicons name={isStarred ? 'star' : 'star-outline'} size={14} color={isStarred ? theme.accentWarm : theme.textTertiary} style={{ marginRight: 4 }} />
+          <Text style={[styles.starBtnText, { color: isStarred ? theme.accentWarm : theme.textTertiary }]}>{isStarred ? 'Starred' : 'Star'}</Text>
+        </View>
       </TouchableOpacity>
       <TouchableOpacity
         style={[styles.btn, { backgroundColor: isDone ? '#DCFCE7' : '#22C55E' }]}
@@ -174,7 +181,7 @@ function ActivityCardActions({ activity, isDone, isSkipped, isStarred, onUpdate,
         accessibilityLabel={isDone ? 'Mark as not done' : 'Mark as done'}
       >
         <Text style={[styles.btnText, { color: isDone ? '#22C55E' : '#FFFFFF' }]}>
-          {isDone ? '↩ Undo' : '✓ Done'}
+          {isDone ? 'Undo' : 'Done'}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -184,7 +191,7 @@ function ActivityCardActions({ activity, isDone, isSkipped, isStarred, onUpdate,
         accessibilityLabel={isSkipped ? 'Unskip activity' : 'Skip this activity'}
       >
         <Text style={[styles.btnText, { color: theme.textTertiary }]}>
-          {isSkipped ? '↩ Undo' : '⏭ Skip'}
+          {isSkipped ? 'Undo' : 'Skip'}
         </Text>
       </TouchableOpacity>
     </View>
@@ -254,8 +261,12 @@ export default function ActivityCard({ activity, onUpdate, onSwap, onFieldUpdate
       onPress={() => setExpanded(!expanded)}
       style={[
         styles.card,
-        { backgroundColor: theme.cardBg, borderLeftColor: isDone ? '#22C55E' : isSkipped ? theme.textSecondary : cat.color },
-        isStarred && { backgroundColor: theme.isDark ? '#78350F' : '#FFFBEB' },
+        {
+          backgroundColor: theme.cardBg,
+          borderLeftColor: isDone ? '#22C55E' : isSkipped ? theme.textSecondary : (isStarred ? theme.accentWarm : cat.color),
+        },
+        isStarred && !isDone && !isSkipped && { backgroundColor: theme.isDark ? '#1E3A5F' : '#EFF6FF' },
+        expanded && styles.cardExpanded,
         isSkipped && { opacity: 0.55 },
       ]}
       accessibilityRole="button"
@@ -269,7 +280,7 @@ export default function ActivityCard({ activity, onUpdate, onSwap, onFieldUpdate
             <Text style={[styles.description, { color: theme.textTertiary }]}>{activity.description}</Text>
             <WeatherAdvice activity={activity} dayId={dayId} />
 
-            {hasBad && !isDone && !isSkipped && (
+            {!isDone && !isSkipped && (
               <SwapSection
                 activity={activity}
                 dayId={dayId}
@@ -284,12 +295,15 @@ export default function ActivityCard({ activity, onUpdate, onSwap, onFieldUpdate
 
             {activity.bookingUrl ? (
               <TouchableOpacity
-                style={styles.bookingBtn}
+                style={[styles.bookingBtn, { backgroundColor: theme.accent }]}
                 onPress={() => Linking.openURL(activity.bookingUrl)}
                 accessibilityRole="link"
                 accessibilityLabel="Book or reserve this activity"
               >
-                <Text style={styles.bookingBtnText}>🎟 Book / Reserve</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Ionicons name="open-outline" size={14} color="#FFFFFF" style={{ marginRight: 6 }} />
+                  <Text style={styles.bookingBtnText}>Book / Reserve</Text>
+                </View>
               </TouchableOpacity>
             ) : null}
 
@@ -299,12 +313,12 @@ export default function ActivityCard({ activity, onUpdate, onSwap, onFieldUpdate
                 accessibilityRole="link"
                 accessibilityLabel={`Open ${activity.address} in maps`}
               >
-                <Text style={styles.address}>📍 {activity.address}</Text>
+                <Text style={styles.address}>{activity.address}</Text>
               </TouchableOpacity>
             )}
             {activity.notes && (
-              <View style={[styles.notesBox, { backgroundColor: theme.isDark ? '#78350F' : '#FEF3C7' }]}>
-                <Text style={[styles.notesText, { color: theme.isDark ? '#FCD34D' : '#92400E' }]}>💡 {activity.notes}</Text>
+              <View style={[styles.notesBox, { backgroundColor: theme.isDark ? '#1E3A5F' : '#EFF6FF' }]}>
+                <Text style={[styles.notesText, { color: theme.isDark ? '#93C5FD' : '#1D4ED8' }]}>{activity.notes}</Text>
               </View>
             )}
 
@@ -338,15 +352,20 @@ export default function ActivityCard({ activity, onUpdate, onSwap, onFieldUpdate
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 14,
+    borderRadius: 16,
     padding: 14,
     marginBottom: 10,
-    borderLeftWidth: 4,
+    borderLeftWidth: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 3,
+    shadowOpacity: 0.04,
+    shadowRadius: 2,
     elevation: 1,
+  },
+  cardExpanded: {
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
   },
   row: { flexDirection: 'row', alignItems: 'center' },
   emoji: { fontSize: 24, marginRight: 10 },
@@ -356,21 +375,21 @@ const styles = StyleSheet.create({
   strikethrough: { textDecorationLine: 'line-through' },
   badges: { flexDirection: 'row', alignItems: 'center', marginTop: 4, flexWrap: 'wrap' },
   duration: { fontSize: 12, marginLeft: 6 },
-  bookingBadge: { marginLeft: 6, paddingHorizontal: 6, paddingVertical: 1, borderRadius: 8, backgroundColor: '#DBEAFE' },
+  bookingBadge: { marginLeft: 6, paddingHorizontal: 6, paddingVertical: 1, borderRadius: 6, backgroundColor: '#DBEAFE' },
   bookingBadgeText: { fontSize: 10, fontWeight: '600', color: '#1D4ED8' },
-  weatherRisk: { paddingHorizontal: 6, paddingVertical: 1, borderRadius: 8, marginLeft: 6 },
+  weatherRisk: { paddingHorizontal: 6, paddingVertical: 1, borderRadius: 6, marginLeft: 6 },
   weatherRiskText: { fontSize: 11, fontWeight: '600' },
   commentPreview: { fontSize: 11, marginTop: 3, fontStyle: 'italic' },
   timeWrap: { alignItems: 'flex-end' },
   time: { fontSize: 14, fontWeight: '700' },
   expandedSection: { marginTop: 12, paddingTop: 12, borderTopWidth: 1 },
   description: { fontSize: 14, lineHeight: 21 },
-  address: { marginTop: 8, fontSize: 13, color: '#3B82F6' },
+  address: { marginTop: 8, fontSize: 13, color: '#2563EB' },
   notesBox: { marginTop: 8, padding: 8, borderRadius: 8 },
   notesText: { fontSize: 13 },
-  bookingBtn: { marginTop: 10, backgroundColor: '#1D4ED8', borderRadius: 10, padding: 12, alignItems: 'center' },
+  bookingBtn: { marginTop: 10, borderRadius: 20, padding: 12, alignItems: 'center' },
   bookingBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 13 },
-  commentSection: { marginTop: 10, borderRadius: 10, padding: 10 },
+  commentSection: { marginTop: 10, borderRadius: 8, padding: 10 },
   commentLabel: { fontSize: 12, fontWeight: '700', marginBottom: 6 },
   commentDisplay: { paddingVertical: 4 },
   commentText: { fontSize: 13, lineHeight: 19 },
@@ -382,21 +401,21 @@ const styles = StyleSheet.create({
   commentCancel: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
   commentCancelText: { fontWeight: '600', fontSize: 12 },
   buttons: { flexDirection: 'row', marginTop: 12 },
-  starBtn: { paddingVertical: 10, paddingHorizontal: 12, borderRadius: 10, alignItems: 'center', marginRight: 4 },
+  starBtn: { paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8, alignItems: 'center', marginRight: 4 },
   starBtnText: { fontWeight: '600', fontSize: 12 },
-  btn: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center', marginHorizontal: 4 },
+  btn: { flex: 1, paddingVertical: 10, borderRadius: 8, alignItems: 'center', marginHorizontal: 4 },
   btnText: { fontWeight: '600', fontSize: 13 },
-  swapBtn: { marginTop: 10, backgroundColor: '#7C3AED', borderRadius: 10, padding: 12, alignItems: 'center' },
+  swapBtn: { marginTop: 10, borderRadius: 8, padding: 12, alignItems: 'center' },
   swapLoading: { flexDirection: 'row', alignItems: 'center' },
   swapBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 13 },
-  swapResult: { marginTop: 10, backgroundColor: '#F5F3FF', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#DDD6FE' },
-  swapResultTitle: { fontSize: 12, fontWeight: '700', color: '#7C3AED', marginBottom: 4 },
+  swapResult: { marginTop: 10, borderRadius: 12, padding: 12, borderWidth: 1 },
+  swapResultTitle: { fontSize: 12, fontWeight: '700', marginBottom: 4 },
   swapResultName: { fontSize: 15, fontWeight: '800', marginBottom: 4 },
   swapResultDesc: { fontSize: 13, lineHeight: 19, marginBottom: 4 },
-  swapResultReason: { fontSize: 12, color: '#7C3AED', marginBottom: 8, fontStyle: 'italic' },
+  swapResultReason: { fontSize: 12, marginBottom: 8, fontStyle: 'italic' },
   swapResultMeta: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
   swapActions: { flexDirection: 'row' },
-  swapAccept: { flex: 1, backgroundColor: '#7C3AED', borderRadius: 8, padding: 10, alignItems: 'center', marginRight: 6 },
+  swapAccept: { flex: 1, borderRadius: 8, padding: 10, alignItems: 'center', marginRight: 6 },
   swapAcceptText: { color: '#FFFFFF', fontWeight: '700', fontSize: 13 },
   swapDismiss: { flex: 1, borderRadius: 8, padding: 10, alignItems: 'center', marginLeft: 6 },
   swapDismissText: { fontWeight: '600', fontSize: 13 },
