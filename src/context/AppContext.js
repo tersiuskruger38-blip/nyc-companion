@@ -24,7 +24,7 @@ const initialState = {
   settings: DEFAULT_SETTINGS,
   weather: STATIC_WEATHER,
   addedEventIds: [],
-  darkMode: 'system', // 'system' | 'light' | 'dark'
+  darkMode: 'light', // 'system' | 'light' | 'dark'
   loaded: false,
 };
 

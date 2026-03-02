@@ -80,9 +80,9 @@ export default function SettingsScreen() {
       <Text style={[styles.title, { color: theme.text }]} accessibilityRole="header">Settings</Text>
       <Text style={[styles.subtitle, { color: theme.textSecondary }]}>Personalize your AI recommendations</Text>
 
-      <View style={[styles.card, { backgroundColor: theme.headerBg }]}>
-        <Text style={styles.cardTitle}>🤖 AI Preferences</Text>
-        <Text style={styles.cardDesc}>
+      <View style={[styles.card, { backgroundColor: theme.accentLight }]}>
+        <Text style={[styles.cardTitle, { color: theme.accent }]}>AI Preferences</Text>
+        <Text style={[styles.cardDesc, { color: theme.textTertiary }]}>
           These settings shape how the AI suggests activities, swaps, and recommendations throughout the app.
         </Text>
       </View>
